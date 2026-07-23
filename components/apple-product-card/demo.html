@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    *{box-sizing:border-box}
+    body{min-height:100vh;margin:0;background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
+    .product-rail{padding:42px 0 54px;overflow:hidden}
+    .heading{width:min(1280px,calc(100% - 48px));margin:0 auto 16px;font-size:28px;line-height:1.2;letter-spacing:0}
+    .heading span{color:#6e6e73;white-space:nowrap}
+    .scroller{overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none}
+    .scroller::-webkit-scrollbar{display:none}
+    .track{width:max-content;padding:16px max(24px,calc((100vw - 1280px)/2)) 40px;display:inline-flex;gap:20px}
+    .card{position:relative;width:400px;height:500px;flex:0 0 auto;overflow:hidden;scroll-snap-align:start;border-radius:18px;background:#eeedf2;box-shadow:2px 4px 12px rgba(0,0,0,.08);transition:transform .24s ease}
+    .card:hover{transform:scale(1.012)}
+    .content{position:absolute;z-index:2;inset:0 0 auto;padding:28px}
+    .eyebrow{margin:0 0 7px;color:#bf4800;font-size:12px;font-weight:600}
+    h2{margin:0;font-size:28px;line-height:1.14;letter-spacing:0}
+    .description{margin:8px 0 0;font-size:17px}
+    .price{margin:8px 0 0;color:#515154;font-size:14px}
+    img{position:absolute;z-index:1;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+    .controls{position:fixed;z-index:5;right:16px;bottom:16px;display:flex;gap:6px}
+    .controls button{width:36px;height:36px;border:1px solid rgba(0,0,0,.12);border-radius:50%;background:rgba(255,255,255,.9);color:#1d1d1f;font-size:18px;cursor:pointer;backdrop-filter:blur(8px)}
+    .controls button:disabled{opacity:.35}
+    @media(max-width:600px){.product-rail{padding-top:32px}.heading{width:calc(100% - 32px);font-size:24px}.track{padding-left:16px;padding-right:16px}.card{width:min(320px,calc(100vw - 48px));height:auto;aspect-ratio:4/5}.content{padding:24px}.controls{display:none}}
+    @media(prefers-reduced-motion:reduce){.card{transition:none}.scroller{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <section class="product-rail" aria-labelledby="title">
+    <h1 class="heading" id="title">限时特惠。<span>科科主打，门门必备。</span></h1>
+    <div class="scroller" id="scroller">
+      <div class="track">
+        <article class="card">
+          <div class="content"><p class="eyebrow">优惠适用</p><h2>MacBook Air</h2><p class="description">强势动力现来自 M5。</p><p class="price">RMB 9,249 起</p></div>
+          <img src="../../assets/apple-education/macbook-air-education.jpg" alt="学生与 MacBook Air 及创作工具的拼贴画">
+        </article>
+        <article class="card">
+          <div class="content"><p class="eyebrow">优惠适用</p><h2>MacBook Pro</h2><p class="description">M5、M5 Pro 和 M5 Max 现已集结。</p><p class="price">RMB 15,199 起</p></div>
+          <img src="../../assets/apple-education/macbook-pro-education.jpg" alt="学生与 MacBook Pro 及创作工具的拼贴画">
+        </article>
+        <article class="card">
+          <div class="content"><p class="eyebrow">优惠适用</p><h2>iPad Air</h2><p class="description">强势动力现来自 M4。</p><p class="price">RMB 5,599 起</p></div>
+          <img src="../../assets/apple-education/ipad-air-education.jpg" alt="学生与 iPad Air 及学习用品的拼贴画">
+        </article>
+      </div>
+    </div>
+  </section>
+  <div class="controls"><button id="prev" type="button" aria-label="上一个">←</button><button id="next" type="button" aria-label="下一个">→</button></div>
+  <script>
+    const scroller=document.querySelector('#scroller');
+    const cards=[...document.querySelectorAll('.card')];
+    let active=0;
+    function go(index){active=Math.max(0,Math.min(cards.length-1,index));cards[active].scrollIntoView({behavior:'smooth',inline:'start',block:'nearest'});document.querySelector('#prev').disabled=active===0;document.querySelector('#next').disabled=active===cards.length-1}
+    document.querySelector('#prev').addEventListener('click',()=>go(active-1));
+    document.querySelector('#next').addEventListener('click',()=>go(active+1));
+    go(0);
+  </script>
+</body>
+</html>

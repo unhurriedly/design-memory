@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root{--ink:#20242d;--muted:#68707d;--line:#e3e6eb;--soft:#f4f5f7;--violet:#5854f7;--violet-soft:#f7f7ff;--violet-line:#d5d3ff}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-width:320px;background:#f7f8fa;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
+    button,input{font:inherit}
+    button{color:inherit}
+    .stage{min-height:100vh;padding:14px;background:#f7f8fa}
+    .window{min-height:calc(100vh - 28px);overflow:hidden;border:1px solid #e1e5eb;border-radius:18px;background:#fff;box-shadow:0 14px 38px rgba(31,38,55,.08);display:flex;flex-direction:column}
+    .chrome{min-height:62px;padding:0 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:15px;background:#fbfcfd}
+    .traffic{display:flex;gap:7px}.traffic i{width:10px;height:10px;border-radius:50%;background:#e3e6eb}
+    .brand{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:750}.brand-mark{position:relative;width:24px;height:20px}.brand-mark::before,.brand-mark::after{content:"";position:absolute;width:16px;height:16px;border-radius:2px}.brand-mark::before{left:0;bottom:0;background:#423fe3}.brand-mark::after{right:0;top:0;background:#27d5e6;opacity:.92}
+    .actions{margin-left:auto;display:flex;align-items:center;gap:10px}.modes{height:34px;padding:4px;border-radius:9px;background:#f5f6f8;display:flex;gap:3px}.mode{width:28px;height:26px;padding:0;overflow:hidden;border:0;border-radius:6px;background:transparent;display:grid;place-items:center;cursor:pointer}.mode.active{background:#fff;box-shadow:0 1px 4px rgba(30,36,52,.12)}.mode-icon{display:grid;grid-template-columns:repeat(3,5px);gap:2px;line-height:0}.mode-icon i{display:block;width:5px;height:16px;border-radius:1px;background:#c5cad2}.mode.active .mode-icon i{background:var(--violet)}.mode-icon.single{display:block}.mode-icon.single i{width:14px;border:2px solid #c5cad2;background:transparent}.mode.active .mode-icon.single i{border-color:var(--violet);background:transparent}.mode-icon.grid{grid-template-columns:repeat(2,6px)}.mode-icon.grid i{width:6px;height:6px}
+    .replay{height:35px;padding:0 13px;border:1px solid var(--line);border-radius:8px;background:#fff;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;cursor:pointer}.replay:disabled{opacity:.55}.replay span{font-size:18px;line-height:1}
+    .comparison{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:1;min-height:290px}.comparison.view-one{grid-template-columns:1fr}.comparison.view-one .model-panel:not(:first-child){display:none}.comparison.view-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.model-panel{min-width:0;padding:18px 16px 20px;border-right:1px solid var(--line)}.model-panel:last-child{border-right:0}.model-head{height:27px;display:flex;align-items:center;gap:9px;font-size:14px;font-weight:750}.model-logo{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800}.gpt{border:1.5px solid #343942}.claude{background:#df7650;color:#fff}.gemini{color:#3a73dc;font-size:18px}
+    .prompt{min-height:58px;margin-top:12px;padding:12px;border-radius:10px;background:var(--soft);font-size:12px;font-weight:600;line-height:1.55}.answer{margin:13px 0 0;min-height:92px;font-size:12px;line-height:1.75;white-space:pre-wrap}.answer.pending{color:#9299a4}.answer.pending::after{content:"";display:inline-block;width:5px;height:14px;margin-left:3px;vertical-align:-2px;background:var(--violet);animation:blink .7s step-end infinite}
+    .summary{margin:0 16px 12px;padding:14px 16px;border:1px solid var(--violet-line);border-radius:11px;background:var(--violet-soft);display:flex;gap:12px;align-items:flex-start;opacity:0;transform:translateY(8px);transition:opacity .24s,transform .24s}.summary.visible{opacity:1;transform:translateY(0)}.spark{color:var(--violet);font-size:18px;line-height:1.5}.summary-text{margin:0;font-size:12px;line-height:1.75;white-space:pre-wrap}.summary-text strong{font-weight:750}
+    .composer{margin:0 16px 15px;padding:8px 9px 8px 14px;border-radius:10px;background:#f1f3f5;display:flex;align-items:center;gap:8px}.composer input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-size:12px}.composer input::placeholder{color:#9ba2ad}.pill{height:30px;padding:0 11px;border:1px solid #dfe3e8;border-radius:16px;background:#fff;color:#555f6d;font-size:10px}.pill.accent{border-color:#cfceff;background:#f5f4ff;color:var(--violet)}.send{width:36px;height:36px;border:0;border-radius:8px;background:var(--violet);color:#fff;font-size:20px;cursor:pointer}
+    @keyframes blink{50%{opacity:0}}
+    @media(max-width:720px){.stage{padding:8px}.window{min-height:calc(100vh - 16px);border-radius:13px}.chrome{min-height:55px;padding:0 12px}.traffic{display:none}.brand{font-size:14px}.modes{display:none}.replay{width:35px;padding:0;justify-content:center}.replay b{display:none}.comparison,.comparison.view-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory}.model-panel{width:85vw;flex:0 0 85vw;scroll-snap-align:start}.summary{margin-left:10px;margin-right:10px}.composer{margin-left:10px;margin-right:10px}.pill{display:none}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <section class="window" aria-label="多模型回答对比">
+      <header class="chrome">
+        <span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="brand"><span class="brand-mark" aria-hidden="true"></span>DiffMind</span>
+        <div class="actions">
+          <div class="modes" aria-label="视图模式">
+            <button class="mode" data-view="one" type="button" aria-label="单列视图"><span class="mode-icon single"><i></i></span></button>
+            <button class="mode active" data-view="columns" type="button" aria-label="三列视图"><span class="mode-icon"><i></i><i></i><i></i></span></button>
+            <button class="mode" data-view="grid" type="button" aria-label="网格视图"><span class="mode-icon grid"><i></i><i></i><i></i><i></i></span></button>
+          </div>
+          <button class="replay" id="replay" type="button"><span aria-hidden="true">↻</span><b>重播</b></button>
+        </div>
+      </header>
+      <div class="comparison" id="comparison">
+        <article class="model-panel"><div class="model-head"><span class="model-logo gpt">G</span>GPT-5.5</div><div class="prompt">审稿人说我的论文创新性不足，回复信怎么写才能提高录用机会？</div><p class="answer" data-answer="0"></p></article>
+        <article class="model-panel"><div class="model-head"><span class="model-logo claude">C</span>Claude Opus 4.8</div><div class="prompt">审稿人说我的论文创新性不足，回复信怎么写才能提高录用机会？</div><p class="answer" data-answer="1"></p></article>
+        <article class="model-panel"><div class="model-head"><span class="model-logo gemini">✦</span>Gemini 3.5 Flash</div><div class="prompt">审稿人说我的论文创新性不足，回复信怎么写才能提高录用机会？</div><p class="answer" data-answer="2"></p></article>
+      </div>
+      <div class="summary" id="summary"><span class="spark">✦</span><p class="summary-text" id="summaryText"></p></div>
+      <form class="composer"><input type="text" aria-label="发送消息给所有模型" placeholder="发送消息给所有模型…"><button class="pill" type="button">◎ 联网搜索</button><button class="pill accent" type="button">✦ 提问增强</button><button class="send" type="submit" aria-label="发送">↑</button></form>
+    </section>
+  </div>
+  <script>
+    const answers=[
+      '不要正面反驳，先承认表述不足。把贡献拆成理论、方法、数据三个维度，逐条给出增量证据，并在回复信开头用三句话重写核心贡献。',
+      '「创新性不足」多数时候是论文没讲清楚定位。建议补一段与最接近的 2–3 篇工作的正面对比，划清边界，语气保持感谢与合作，而不是辩护。',
+      '先判断期刊层级是否匹配：如果贡献确实是渐进式的，可以强调应用价值与可复现性，把「创新性」重新表述为对具体问题的第一个系统解法。'
+    ];
+    const summary='一键总结 · 共识：问题多半出在贡献表述不清——重写贡献、补对比证据、保持合作语气。分歧：GPT 主张开头三句话重述贡献，Claude 主张补齐与相近工作的正面对比，Gemini 提醒先评估期刊匹配度。建议：先重写贡献表述，再补对比，逐条回应。';
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let runId=0;
+    function typeText(node,text,speed,delay,id){return new Promise(resolve=>{setTimeout(()=>{if(id!==runId)return resolve();if(reduced){node.textContent=text;return resolve()}let index=0;const timer=setInterval(()=>{if(id!==runId){clearInterval(timer);return resolve()}node.textContent=text.slice(0,++index);if(index>=text.length){clearInterval(timer);resolve()}},speed)},delay)})}
+    async function play(){const id=++runId;const replay=document.querySelector('#replay');const nodes=[...document.querySelectorAll('[data-answer]')];replay.disabled=true;document.querySelector('#summary').classList.remove('visible');document.querySelector('#summaryText').textContent='';nodes.forEach(node=>{node.textContent='思考中';node.classList.add('pending')});await Promise.all(nodes.map((node,index)=>{node.textContent='';return typeText(node,answers[index],7,180+index*130,id).then(()=>node.classList.remove('pending'))}));if(id!==runId)return;document.querySelector('#summary').classList.add('visible');await typeText(document.querySelector('#summaryText'),summary,4,120,id);replay.disabled=false}
+    document.querySelector('#replay').addEventListener('click',play);
+    document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-view]').forEach(item=>item.classList.toggle('active',item===button));const comparison=document.querySelector('#comparison');comparison.className='comparison'+(button.dataset.view==='columns'?'':' view-'+button.dataset.view)}));
+    document.querySelector('.composer').addEventListener('submit',event=>{event.preventDefault();play()});
+    play();
+  </script>
+</body>
+</html>

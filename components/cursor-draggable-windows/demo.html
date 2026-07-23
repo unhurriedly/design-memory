@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root{--ink:#26251e;--muted:#77756d;--line:rgba(38,37,30,.13);--chrome:#f2f1ed;--green:#26865e;--red:#c95d59}
+    *{box-sizing:border-box}
+    html,body{min-width:320px;min-height:100%;margin:0;background:#f4f3ee;color:var(--ink);font-family:Arial,"PingFang SC",sans-serif}
+    button{font:inherit}
+    .demo{min-height:100vh;padding:14px;display:grid;place-items:center}
+    .stage{position:relative;width:min(1240px,calc(100vw - 28px));aspect-ratio:31/18;overflow:hidden;border-radius:4px;background:#d8d1c5 url("../../assets/cursor-draggable-windows/cursor-stage.webp") center/cover no-repeat;container-type:inline-size;isolation:isolate}
+    .demo-window{position:absolute;left:calc(var(--x)*1%);top:calc(var(--y)*1%);width:calc(var(--w)*1%);height:calc(var(--h)*1%);z-index:var(--z);min-width:0;min-height:0;overflow:hidden;border-radius:10px;background:var(--chrome);box-shadow:0 28px 70px rgba(0,0,0,.14),0 14px 32px rgba(0,0,0,.1),0 0 0 1px var(--line);display:flex;flex-direction:column;user-select:none;transition:box-shadow .18s ease,filter .18s ease}
+    .demo-window:not(.is-active){filter:saturate(.92)}
+    .demo-window.is-active{box-shadow:0 30px 76px rgba(0,0,0,.18),0 16px 34px rgba(0,0,0,.11),0 0 0 1px rgba(38,37,30,.16)}
+    .titlebar{height:clamp(20px,2.26cqw,28px);flex:0 0 auto;padding:0 clamp(6px,.7cqw,9px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;cursor:grab;touch-action:none}
+    .titlebar:active{cursor:grabbing}
+    .traffic{display:flex;gap:clamp(3px,.45cqw,6px)}
+    .traffic i{width:clamp(6px,.72cqw,9px);height:clamp(6px,.72cqw,9px);border-radius:50%;background:#cecdc8}
+    .window-title{position:absolute;left:50%;transform:translateX(-50%);color:#68665f;font-size:clamp(7px,.88cqw,11px);white-space:nowrap}
+    .window-action{height:clamp(16px,1.9cqw,24px);padding:0 clamp(5px,.7cqw,9px);border:0;border-radius:4px;background:#dfded8;color:#55534d;font-size:clamp(6px,.72cqw,9px)}
+    .desktop-body{min-height:0;flex:1;display:grid;grid-template-columns:24% 32% 44%;font-size:clamp(6px,.82cqw,10px)}
+    .task-list,.agent-pane{min-width:0;border-right:1px solid var(--line)}
+    .pane-head{height:clamp(24px,3.2cqw,40px);padding:0 clamp(7px,1cqw,13px);display:flex;align-items:center;color:#68665f;border-bottom:1px solid var(--line)}
+    .task-row{min-height:clamp(30px,4.7cqw,58px);padding:clamp(5px,.65cqw,8px) clamp(7px,1cqw,13px);border-bottom:1px solid rgba(38,37,30,.07);display:grid;grid-template-columns:auto 1fr auto;gap:clamp(4px,.55cqw,7px);align-items:start}
+    .task-check{width:clamp(8px,1cqw,12px);height:clamp(8px,1cqw,12px);margin-top:2px;border:1px solid #78766f;border-radius:50%;display:grid;place-items:center;color:#66645e;font-size:7px}
+    .task-copy{min-width:0}.task-copy strong,.task-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.task-copy strong{font-weight:500}.task-copy small{margin-top:3px;color:#96938a}.task-time{color:#9b988f}
+    .agent-pane{padding:clamp(8px,1.2cqw,15px)}
+    .prompt{padding:clamp(6px,.8cqw,10px);border:1px solid var(--line);border-radius:5px;background:#faf9f5;font-weight:500}
+    .steps{margin:clamp(8px,1.2cqw,15px) 0;color:#8a877e;line-height:1.8}
+    .agent-copy{margin:0;line-height:1.55}
+    .file-change{margin-top:clamp(7px,1cqw,12px);padding:clamp(5px,.7cqw,8px);border:1px solid var(--line);border-radius:5px;background:#faf9f5;display:flex;justify-content:space-between}.plus{color:var(--green)}.minus{color:var(--red)}
+    .browser-pane{min-width:0;background:#f7f6f1}
+    .browser-bar{height:clamp(24px,3.2cqw,40px);padding:0 clamp(7px,1cqw,13px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:clamp(6px,.8cqw,10px);color:#77746c}
+    .browser-url{margin-left:5px;color:#34332d}
+    .browser-page{padding:clamp(14px,3.2cqw,40px);font-family:Georgia,serif}
+    .browser-page h2{margin:0 0 clamp(12px,2cqw,25px);font-size:clamp(10px,1.8cqw,22px);font-weight:500;font-style:italic}
+    .browser-page p{max-width:34em;margin:0 0 clamp(8px,1.5cqw,18px);color:#716f68;font-size:clamp(7px,1.1cqw,14px);line-height:1.55}
+    .browser-links{display:flex;gap:clamp(10px,2cqw,25px);margin-top:clamp(12px,2.5cqw,31px);font-size:clamp(7px,1.1cqw,14px);text-decoration:underline}
+    .cli-body{min-height:0;flex:1;padding:clamp(10px,1.6cqw,20px);background:#f5f4ef;font-family:"SFMono-Regular",Consolas,monospace;font-size:clamp(6px,.78cqw,10px);line-height:1.55}
+    .cli-path{margin-bottom:clamp(8px,1.2cqw,15px);color:#77746c}.cli-path strong{color:#34332d}
+    .cli-command{padding:clamp(7px,1cqw,12px);border:1px solid var(--line);border-radius:5px;background:#ecebe6}
+    .cli-output{margin:clamp(8px,1.2cqw,15px) 0;color:#5f5d57}.cli-input{margin-top:auto;padding-top:clamp(7px,1cqw,12px);border-top:1px solid var(--line);color:#8a877e}
+    .resize-handle{position:absolute;z-index:4;touch-action:none}
+    .resize-handle[data-dir="n"],.resize-handle[data-dir="s"]{left:8px;right:8px;height:8px;cursor:ns-resize}.resize-handle[data-dir="n"]{top:0}.resize-handle[data-dir="s"]{bottom:0}
+    .resize-handle[data-dir="e"],.resize-handle[data-dir="w"]{top:8px;bottom:8px;width:8px;cursor:ew-resize}.resize-handle[data-dir="e"]{right:0}.resize-handle[data-dir="w"]{left:0}
+    .resize-handle[data-dir="nw"],.resize-handle[data-dir="ne"],.resize-handle[data-dir="sw"],.resize-handle[data-dir="se"]{width:11px;height:11px}.resize-handle[data-dir="nw"]{left:0;top:0;cursor:nwse-resize}.resize-handle[data-dir="ne"]{right:0;top:0;cursor:nesw-resize}.resize-handle[data-dir="sw"]{left:0;bottom:0;cursor:nesw-resize}.resize-handle[data-dir="se"]{right:0;bottom:0;cursor:nwse-resize}
+    @media(max-width:700px){.demo{padding:8px}.stage{width:calc(100vw - 16px);aspect-ratio:4/3}.task-list{display:none}.desktop-body{grid-template-columns:46% 54%}.agent-pane{border-right:1px solid var(--line)}.window-title{font-size:7px}.demo-window{border-radius:7px}}
+    @media(prefers-reduced-motion:reduce){.demo-window{transition:none}}
+  </style>
+</head>
+<body>
+  <main class="demo">
+    <section class="stage" id="stage" aria-label="可拖拽缩放的 Cursor 产品窗口">
+      <article class="demo-window is-active" data-window="desktop" style="--x:6.45;--y:6.94;--w:87.1;--h:86.1;--z:2">
+        <header class="titlebar" data-drag-handle><span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span><span class="window-title">Cursor Desktop</span><button class="window-action" type="button">获取 Cursor</button></header>
+        <div class="desktop-body">
+          <aside class="task-list"><div class="pane-head">待审查 6</div>
+            <div class="task-row"><span class="task-check">✓</span><span class="task-copy"><strong>构建落地页</strong><small>完成 · 字体和关键 CSS 已处理</small></span><span class="task-time">now</span></div>
+            <div class="task-row"><span class="task-check">✓</span><span class="task-copy"><strong>分析 Tab 使用模式</strong><small>已拉取工作区数据</small></span><span class="task-time">now</span></div>
+            <div class="task-row"><span class="task-check">✓</span><span class="task-copy"><strong>规划 Mission Control</strong><small><span class="plus">+20</span> <span class="minus">-3</span> · feature-prd.md</small></span><span class="task-time">10m</span></div>
+            <div class="task-row"><span class="task-check">✓</span><span class="task-copy"><strong>PyTorch MNIST 实验</strong><small>训练与评估完成</small></span><span class="task-time">30m</span></div>
+          </aside>
+          <section class="agent-pane"><strong>构建落地页</strong><div class="prompt">根据附加文档制作一个介绍我们业务的落地页</div><div class="steps">读取 about-acme.md<br>读取 brand-guidelines.pdf<br>思考 6 秒</div><p class="agent-copy">我会创建一个极简、以衬线字体为主的落地页，契合品牌调性。</p><div class="file-change"><span>app/page.tsx</span><span><b class="plus">+52</b> <b class="minus">-0</b></span></div><div class="file-change"><span>app/globals.css</span><span><b class="plus">+18</b> <b class="minus">-0</b></span></div></section>
+          <section class="browser-pane"><div class="browser-bar"><span>←</span><span>→</span><span>↻</span><span class="browser-url">http://localhost:3000</span></div><div class="browser-page"><h2>Acme Labs</h2><p>Software creation is changing. We are a group of researchers, engineers, and technologists inventing at the edge of what's useful and possible.</p><p>We have much to learn, try, and build.</p><div class="browser-links"><span>See projects</span><span>Join our team →</span></div></div></section>
+        </div>
+        <i class="resize-handle" data-dir="n"></i><i class="resize-handle" data-dir="s"></i><i class="resize-handle" data-dir="e"></i><i class="resize-handle" data-dir="w"></i><i class="resize-handle" data-dir="nw"></i><i class="resize-handle" data-dir="ne"></i><i class="resize-handle" data-dir="sw"></i><i class="resize-handle" data-dir="se"></i>
+      </article>
+      <article class="demo-window" data-window="cli" style="--x:58.7;--y:45.55;--w:38.7;--h:50;--z:3">
+        <header class="titlebar" data-drag-handle><span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span><span class="window-title">Cursor CLI</span><button class="window-action" type="button">获取 CLI</button></header>
+        <div class="cli-body"><div class="cli-path"><strong>Cursor 智能体</strong><br>~/cursor/cursor-web</div><div class="cli-command">› 分析 Tab 与智能体的使用模式</div><p class="cli-output">正在读取工作区活动并生成分布报告…<br><span class="plus">✓ 已分析 12 个工作区</span><br>建议将重复任务移交给后台智能体。</p><div class="cli-input">添加后续消息 _</div></div>
+        <i class="resize-handle" data-dir="n"></i><i class="resize-handle" data-dir="s"></i><i class="resize-handle" data-dir="e"></i><i class="resize-handle" data-dir="w"></i><i class="resize-handle" data-dir="nw"></i><i class="resize-handle" data-dir="ne"></i><i class="resize-handle" data-dir="sw"></i><i class="resize-handle" data-dir="se"></i>
+      </article>
+    </section>
+  </main>
+  <script>
+    const stage=document.querySelector('#stage');
+    const windows=[...document.querySelectorAll('.demo-window')];
+    const PAD=2.6,MIN_W=34,MIN_H=36;
+    let action=null,topZ=3;
+    const clamp=(value,min,max)=>Math.min(Math.max(value,min),max);
+    const read=win=>['x','y','w','h'].reduce((state,key)=>({...state,[key]:parseFloat(win.style.getPropertyValue(`--${key}`))}),{});
+    const write=(win,state)=>Object.entries(state).forEach(([key,value])=>win.style.setProperty(`--${key}`,value));
+    function activate(win){topZ+=1;windows.forEach(item=>item.classList.toggle('is-active',item===win));win.style.setProperty('--z',topZ)}
+    function begin(event,win,type,dir=''){if(event.button!==0)return;event.preventDefault();action={win,type,dir,startX:event.clientX,startY:event.clientY,start:read(win),target:event.currentTarget};event.currentTarget.setPointerCapture(event.pointerId)}
+    windows.forEach(win=>{
+      win.addEventListener('pointerdown',()=>activate(win));
+      win.querySelector('[data-drag-handle]').addEventListener('pointerdown',event=>{if(!event.target.closest('button'))begin(event,win,'move')});
+      win.querySelectorAll('[data-dir]').forEach(handle=>handle.addEventListener('pointerdown',event=>begin(event,win,'resize',handle.dataset.dir)));
+    });
+    window.addEventListener('pointermove',event=>{
+      if(!action)return;
+      const rect=stage.getBoundingClientRect();
+      const dx=(event.clientX-action.startX)/rect.width*100,dy=(event.clientY-action.startY)/rect.height*100;
+      const start=action.start,next={...start};
+      if(action.type==='move'){next.x=clamp(start.x+dx,PAD,100-PAD-start.w);next.y=clamp(start.y+dy,PAD,100-PAD-start.h)}
+      else{
+        if(action.dir.includes('e'))next.w=clamp(start.w+dx,MIN_W,100-PAD-start.x);
+        if(action.dir.includes('s'))next.h=clamp(start.h+dy,MIN_H,100-PAD-start.y);
+        if(action.dir.includes('w')){next.x=clamp(start.x+dx,PAD,start.x+start.w-MIN_W);next.w=start.w+(start.x-next.x)}
+        if(action.dir.includes('n')){next.y=clamp(start.y+dy,PAD,start.y+start.h-MIN_H);next.h=start.h+(start.y-next.y)}
+      }
+      write(action.win,next);
+    });
+    window.addEventListener('pointerup',()=>{action=null});
+    window.addEventListener('pointercancel',()=>{action=null});
+  </script>
+</body>
+</html>

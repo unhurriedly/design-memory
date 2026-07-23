@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @font-face{font-family:MiSans;src:url("https://filecdn.minimax.chat/public/MiSans-Normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+    @font-face{font-family:MiSans;src:url("https://filecdn.minimax.chat/public/MiSans-Medium.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+    @font-face{font-family:MiSans;src:url("https://filecdn.minimax.chat/public/MiSans-Semibold.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
+    @font-face{font-family:Outfit;src:url("https://filecdn.minimax.chat/public/09e926a9-f079-4d5f-82c9-1e17dd0ababc.ttf") format("truetype");font-style:normal;font-display:swap}
+    :root{--ink:#181e25;--muted:#86909c;--line:#e5e8eb;--blue:#2864dc;--mint:#16a085;--paper:#fff}
+    *{box-sizing:border-box}
+    html,body{min-width:320px;min-height:100%;margin:0;background:#f4f6f8;color:var(--ink);font-family:MiSans,"PingFang SC",sans-serif}
+    button,input{font:inherit}
+    .demo{min-height:100vh;padding:14px;display:grid;place-items:center}
+    .specimen{width:min(1080px,calc(100vw - 28px));min-height:620px;overflow:hidden;border:1px solid var(--line);border-radius:6px;background:var(--paper);box-shadow:0 18px 48px rgba(24,30,37,.08)}
+    .toolbar{min-height:56px;padding:8px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;background:#fbfcfd}
+    .identity{display:flex;align-items:center;gap:10px;white-space:nowrap}.identity-mark{width:22px;height:22px;border-radius:5px;display:grid;place-items:center;background:var(--ink);color:#fff;font:600 12px/1 Outfit,sans-serif}.identity strong{font:500 13px/1 Outfit,sans-serif}
+    .modes{margin-left:auto;padding:3px;display:flex;gap:2px;border:1px solid var(--line);border-radius:7px;background:#f2f4f6}
+    .modes button{height:28px;padding:0 12px;border:0;border-radius:4px;background:transparent;color:#697582;font-size:11px;cursor:pointer}
+    .modes button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(24,30,37,.12)}
+    .size-control{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:10px;white-space:nowrap}.size-control input{width:90px;accent-color:var(--blue)}.size-control output{width:34px;color:#45515e;font-variant-numeric:tabular-nums}
+    .stage{min-height:564px;position:relative;overflow:hidden}
+    .view{position:absolute;inset:0;padding:clamp(34px,6vw,76px);opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .22s ease,transform .3s ease}
+    .view.is-active{position:relative;opacity:1;transform:none;pointer-events:auto}
+    .eyebrow{margin:0 0 18px;color:var(--blue);font:600 11px/16px MiSans,sans-serif}
+    .brand-title{margin:0;color:var(--ink);font:500 var(--hero-size,80px)/1.1 Outfit,"Helvetica Neue",sans-serif;letter-spacing:0;outline:none}
+    .brand-title span{color:var(--blue)}
+    .brand-copy{max-width:650px;margin:18px 0 0;color:#45515e;font:400 16px/24px MiSans,sans-serif}
+    .metrics{margin-top:54px;padding-top:18px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+    .metric strong,.metric span{display:block}.metric strong{font:500 20px/30px MiSans,sans-serif}.metric span{margin-top:3px;color:var(--muted);font:400 13px/20px MiSans,sans-serif}
+    .section-title{margin:0;color:var(--ink);font:500 28px/48px MiSans,sans-serif;letter-spacing:0;outline:none}.section-copy{margin:0 0 34px;color:var(--muted);font:400 16px/24px MiSans,sans-serif}
+    .model-row{display:grid;grid-template-columns:1.2fr .8fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .model-block{min-height:230px;padding:28px;background:#fff;display:flex;flex-direction:column;justify-content:space-between}.model-block:first-child{background:#f7f9ff}.model-block:last-child{background:#f2fbf8}
+    .model-block h3{margin:0;color:var(--ink);font:500 28px/35px Outfit,sans-serif}.model-block:last-child h3{font-size:18px;line-height:22.5px}.model-block p{margin:0;color:#45515e;font:400 14px/21px MiSans,sans-serif}
+    .article-kicker{margin:0 0 14px;color:var(--mint);font:600 11px/16px MiSans,sans-serif}.article-title{max-width:760px;margin:0;color:var(--ink);font:500 20px/30px MiSans,sans-serif;letter-spacing:0;outline:none}.article-rule{width:64px;height:3px;margin:28px 0;background:var(--blue)}.article-body{max-width:760px;margin:0;color:#45515e;font:400 16px/27px MiSans,sans-serif}.font-pair{margin-top:54px;display:flex;gap:10px;flex-wrap:wrap}.font-chip{padding:9px 12px;border:1px solid var(--line);border-radius:5px;color:#45515e;font-size:12px}.font-chip:first-child{font-family:MiSans,sans-serif}.font-chip:last-child{font-family:Outfit,sans-serif}
+    @media(max-width:680px){.demo{padding:8px}.specimen{width:calc(100vw - 16px);min-height:650px}.toolbar{align-items:flex-start;flex-wrap:wrap}.identity{height:28px}.modes{order:3;width:100%;margin:0}.modes button{flex:1;padding:0 5px}.size-control{margin-left:auto}.stage{min-height:555px}.view{padding:34px 22px}.brand-title{font-size:min(var(--hero-size,48px),15vw);line-height:1.08}.metrics{grid-template-columns:1fr;gap:12px;margin-top:36px}.metric{padding-bottom:10px;border-bottom:1px solid var(--line)}.section-title{font-size:20px}.section-copy{font-size:14px}.model-row{grid-template-columns:1fr}.model-block{min-height:150px}.model-block h3{font-size:24px}.font-pair{margin-top:34px}}
+    @media(prefers-reduced-motion:reduce){.view{transition:none}}
+  </style>
+</head>
+<body>
+  <main class="demo">
+    <section class="specimen" aria-label="MiniMax 字体系统样张">
+      <header class="toolbar">
+        <div class="identity"><span class="identity-mark">M</span><strong>MiSans × Outfit</strong></div>
+        <div class="modes" role="group" aria-label="排版场景">
+          <button type="button" data-mode="brand" aria-pressed="true">品牌标题</button>
+          <button type="button" data-mode="section" aria-pressed="false">产品层级</button>
+          <button type="button" data-mode="article" aria-pressed="false">研究混排</button>
+        </div>
+        <label class="size-control">字号 <input id="heroSize" type="range" min="48" max="96" value="80" aria-label="品牌标题字号"><output for="heroSize">80px</output></label>
+      </header>
+      <div class="stage">
+        <section class="view is-active" data-view="brand">
+          <p class="eyebrow">FRONTIER MODEL · OUTFIT 500</p>
+          <h1 class="brand-title" contenteditable="true" spellcheck="false">MiniMax <span>M3</span></h1>
+          <p class="brand-copy">一个使用全新注意力架构 MSA、拥有 1M 超长上下文的 Coding / Agentic 前沿模型</p>
+          <div class="metrics"><div class="metric"><strong>前沿 Coding 能力</strong><span>真实工程级，不止生成代码，更懂协作</span></div><div class="metric"><strong>MSA · 1M 上下文</strong><span>全新稀疏注意力，让 context 真正可 scale</span></div><div class="metric"><strong>原生多模态</strong><span>Step 0 混合训练 · interleaved 数据</span></div></div>
+        </section>
+        <section class="view" data-view="section">
+          <h2 class="section-title" contenteditable="true" spellcheck="false">旗舰模型</h2>
+          <p class="section-copy">MiniMax 最新首推模型，覆盖语言模型 / 视频生成 / 语音 & 音乐</p>
+          <div class="model-row"><article class="model-block"><p>LANGUAGE MODEL</p><h3>MiniMax M3</h3><p>Coding 顶尖 · 1M 上下文 · 原生多模态</p></article><article class="model-block"><p>VIDEO GENERATION</p><h3>海螺 Hailuo 2.3</h3><p>更自然的运动与更稳定的视觉表现</p></article></div>
+        </section>
+        <section class="view" data-view="article">
+          <p class="article-kicker">最新研究 · MISANS 500</p>
+          <h2 class="article-title" contenteditable="true" spellcheck="false">MaxProof：生成式验证强化学习驱动的数学证明进化系统</h2>
+          <div class="article-rule"></div>
+          <p class="article-body">中英文、数字与技术术语共用 MiSans，维持统一的字面高度和阅读节奏。品牌名与短英文产品名切换到 Outfit，形成更鲜明的科技品牌识别。</p>
+          <div class="font-pair"><span class="font-chip">MiSans · 中文界面与长文本</span><span class="font-chip">Outfit · Brand & Product Names</span></div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script>
+    const buttons=[...document.querySelectorAll('[data-mode]')];
+    const views=[...document.querySelectorAll('[data-view]')];
+    const slider=document.querySelector('#heroSize');
+    const output=slider.nextElementSibling;
+    function setMode(mode){buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));views.forEach(view=>view.classList.toggle('is-active',view.dataset.view===mode));slider.disabled=mode!=='brand'}
+    buttons.forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
+    slider.addEventListener('input',()=>{document.documentElement.style.setProperty('--hero-size',slider.value+'px');output.value=slider.value+'px'});
+  </script>
+</body>
+</html>

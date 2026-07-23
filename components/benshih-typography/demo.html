@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @font-face{font-family:Roobert;src:url("https://www.benshih.design/_next/static/media/e717f2176a60f97a-s.p.otf") format("opentype");font-weight:400;font-display:swap}
+    @font-face{font-family:Roobert;src:url("https://www.benshih.design/_next/static/media/1f43618828b4e276-s.p.otf") format("opentype");font-weight:500;font-display:swap}
+    @font-face{font-family:Roobert;src:url("https://www.benshih.design/_next/static/media/42e56e732b93629f-s.p.otf") format("opentype");font-weight:600;font-display:swap}
+    @font-face{font-family:Roobert;src:url("https://www.benshih.design/_next/static/media/a9a9e888b671f314-s.p.otf") format("opentype");font-weight:700;font-display:swap}
+    @font-face{font-family:Acorn;src:url("https://www.benshih.design/_next/static/media/fdcd9431117e12f7-s.p.otf") format("opentype");font-weight:400;font-display:swap}
+    @font-face{font-family:Acorn;src:url("https://www.benshih.design/_next/static/media/a23bf0b72965d89c-s.p.otf") format("opentype");font-weight:500;font-display:swap}
+    @font-face{font-family:Acorn;src:url("https://www.benshih.design/_next/static/media/78e0d29f8bb7d66f-s.p.otf") format("opentype");font-weight:600;font-display:swap}
+    @font-face{font-family:Acorn;src:url("https://www.benshih.design/_next/static/media/458ab8be65b41e6e-s.p.otf") format("opentype");font-weight:700;font-display:swap}
+    *{box-sizing:border-box}
+    body{margin:0;background:#f9f4ed;color:#4c6763;font-family:Roobert,Arial,sans-serif}
+    .toolbar{min-height:52px;padding:9px 18px;border-bottom:1px solid rgba(76,103,99,.18);display:flex;align-items:center;gap:14px;background:rgba(249,244,237,.96)}
+    .font-name{margin-right:auto;font-size:11px;font-weight:600}
+    label{display:flex;align-items:center;gap:7px;color:#667d79;font-size:10px}
+    select,input[type=range]{accent-color:#4c6763}
+    select{height:30px;padding:0 23px 0 8px;border:1px solid rgba(76,103,99,.3);border-radius:5px;background:#fff;color:#4c6763;font:inherit}
+    input[type=range]{width:100px}
+    .specimen{min-height:468px;padding:clamp(34px,7vw,80px)}
+    .eyebrow{margin:0 0 22px;font-size:13px;font-weight:500;letter-spacing:.08em}
+    h1{max-width:920px;margin:0;font-family:Acorn,Arial,serif;font-size:clamp(52px,8vw,88px);font-weight:600;line-height:.92;letter-spacing:-.02em;outline:none}
+    .body{max-width:660px;margin:31px 0 0;font-size:clamp(18px,2.5vw,24px);font-weight:500;line-height:1.4;outline:none}
+    [contenteditable]:focus{box-shadow:0 2px 0 #4c6763}
+    @media(max-width:520px){.toolbar{align-items:flex-start;flex-wrap:wrap}.font-name{width:100%;margin:0}.specimen{padding:38px 24px}.eyebrow{font-size:10px}h1{font-size:52px}.body{font-size:18px}}
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="font-name">Acorn × Roobert</span>
+    <label>标题字重<select id="weight"><option>400</option><option>500</option><option selected>600</option><option>700</option></select></label>
+    <label>标题字号<input id="size" type="range" min="44" max="108" value="88"></label>
+  </div>
+  <main class="specimen">
+    <p class="eyebrow">PRODUCT DESIGNER & BUILDER</p>
+    <h1 id="title" contenteditable="true" spellcheck="false">Hi, I'm Ben.<br>Design is how I think.</h1>
+    <p class="body" contenteditable="true" spellcheck="false">Lead Product Designer with a Data Science background. Building thoughtful products for people.</p>
+  </main>
+  <script>
+    const title=document.querySelector('#title');
+    document.querySelector('#weight').addEventListener('change',event=>title.style.fontWeight=event.target.value);
+    document.querySelector('#size').addEventListener('input',event=>title.style.fontSize=event.target.value+'px');
+  </script>
+</body>
+</html>

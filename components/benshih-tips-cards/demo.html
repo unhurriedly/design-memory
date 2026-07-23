@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @font-face{font-family:Roobert;src:url("https://www.benshih.design/_next/static/media/1f43618828b4e276-s.p.otf") format("opentype");font-weight:500;font-display:swap}
+    @font-face{font-family:Roobert;src:url("https://www.benshih.design/_next/static/media/42e56e732b93629f-s.p.otf") format("opentype");font-weight:600;font-display:swap}
+    @font-face{font-family:Acorn;src:url("https://www.benshih.design/_next/static/media/78e0d29f8bb7d66f-s.p.otf") format("opentype");font-weight:600;font-display:swap}
+    *{box-sizing:border-box}
+    :root{--cream:#f9f4ed;--ink:#2a3140;--green:#02594e;--orange:#ffd6ae;--purple:#d9d6fe;--blue:#b2ddff;--paper:#fffdf8}
+    body{margin:0;background:var(--cream);color:var(--ink);font-family:Roobert,Arial,sans-serif}
+    button,a{font:inherit}
+    .stage{min-height:100vh;padding:24px;display:grid;place-items:center}
+    .surface{position:relative;width:min(1160px,100%);min-height:492px;overflow:hidden;border:1px solid rgba(42,49,64,.07);border-radius:20px;background-color:rgba(255,255,255,.72);background-image:radial-gradient(circle,rgba(107,114,128,.15) 1px,transparent 1px);background-size:18px 18px}
+    .hint{position:absolute;z-index:20;left:24px;top:20px;margin:0;color:#5d6470;font-size:11px;font-weight:600}
+    .deck{position:absolute;inset:48px 0 0;display:flex;align-items:center;justify-content:center;padding:42px 28px 34px}
+    .card-shell{--x:0px;--scale:1;--opacity:1;--rotation:0deg;position:relative;width:350px;height:386px;flex:0 0 350px;margin-right:-40px;display:grid;place-items:center;z-index:var(--z);opacity:var(--opacity);transform:translateX(var(--x)) rotate(var(--rotation)) scale(var(--scale));transform-origin:center;transition:transform 560ms cubic-bezier(.22,1,.36,1),opacity 180ms ease;cursor:pointer}
+    .card-shell:last-child{margin-right:0}
+    .card{position:relative;width:320px;height:360px;overflow:hidden;padding:32px 32px 40px;border:0;border-radius:24px;background:var(--card-color);box-shadow:0 0 0 1px rgba(0,0,0,.05),0 4px 16px rgba(16,24,40,.08);transform:translateY(0);transition:transform 420ms cubic-bezier(.22,1,.36,1),box-shadow 420ms cubic-bezier(.22,1,.36,1)}
+    .card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.22),transparent 45%);pointer-events:none}
+    .card-shell.is-active .card{transform:translateY(-6px);box-shadow:0 20px 40px rgba(2,89,78,.15)}
+    .card-shell:focus-visible{outline:3px solid rgba(2,89,78,.3);outline-offset:5px}
+    .card-content{position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between}
+    h2{margin:0;font-family:Acorn,Georgia,serif;font-size:40px;font-weight:600;line-height:.9;letter-spacing:0}
+    .description{margin:12px 0 0;font-size:19px;font-weight:500;line-height:1.5}
+    .cta{align-self:flex-start;display:inline-flex;align-items:center;min-height:40px;padding:10px 14px;border-radius:8px;background:#000;color:#fff;font-size:14px;font-weight:600;line-height:20px;text-decoration:none;transition:transform 320ms cubic-bezier(.22,1,.36,1)}
+    .card-shell.is-active .cta{transform:translateX(4px)}
+    .media-card{padding:0;background:#2d3138}
+    .media{position:absolute;inset:0;display:grid;place-items:center;background:#2d3138}
+    .media-grid{width:190px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;transform:rotate(-2deg)}
+    .media-grid span{height:84px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#3c424a;display:grid;place-items:center;color:#fff;font-family:Acorn,Georgia,serif;font-size:18px}
+    .media-grid span:nth-child(2){background:#48585a}.media-grid span:nth-child(3){background:#574f66}.media-grid span:nth-child(4){background:#54483f}
+    .play{position:absolute;width:54px;height:54px;border:0;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 8px 24px rgba(0,0,0,.24);display:grid;place-items:center;color:var(--green);font-size:18px;cursor:pointer}
+    .reveal{position:absolute;z-index:30;left:50%;bottom:calc(100% - 22px);width:280px;height:112px;pointer-events:none;opacity:0;transform:translate(-50%,18px) scale(.7);transition:opacity 120ms ease,transform 440ms cubic-bezier(.34,1.56,.64,1)}
+    .card-shell.is-active .reveal{opacity:1;transform:translate(-50%,0) scale(1)}
+    .mini{position:absolute;left:50%;top:50%;width:112px;height:74px;overflow:hidden;border:2px solid rgba(255,255,255,.9);border-radius:7px;background:var(--mini);box-shadow:0 6px 18px rgba(0,0,0,.22);transform:translate(calc(-50% + var(--mx)),calc(-50% + var(--my))) rotate(var(--mr));display:grid;place-items:center;color:#26313b;font-size:12px;font-weight:600}
+    .mini:nth-child(1){--mx:-66px;--my:4px;--mr:-16deg}.mini:nth-child(2){--mx:2px;--my:-12px;--mr:3deg}.mini:nth-child(3){--mx:66px;--my:4px;--mr:16deg}
+    .confetti{position:absolute;inset:0}.confetti i{position:absolute;left:50%;top:54%;width:7px;height:7px;border-radius:2px;background:var(--confetti);opacity:0}
+    .card-shell.is-active .confetti i{animation:burst .65s ease-out both;animation-delay:var(--delay)}
+    .confetti i:nth-child(1){--confetti:#f59e0b;--tx:-110px;--ty:-58px;--delay:0s}.confetti i:nth-child(2){--confetti:#ec4899;--tx:-64px;--ty:-90px;--delay:.03s}.confetti i:nth-child(3){--confetti:#8b5cf6;--tx:-18px;--ty:-82px;--delay:.06s}.confetti i:nth-child(4){--confetti:#06b6d4;--tx:35px;--ty:-88px;--delay:.09s}.confetti i:nth-child(5){--confetti:#10b981;--tx:78px;--ty:-66px;--delay:.12s}.confetti i:nth-child(6){--confetti:#f97316;--tx:112px;--ty:-32px;--delay:.15s}
+    .video-hint{position:absolute;z-index:30;left:50%;bottom:calc(100% + 2px);width:max-content;opacity:0;transform:translate(-50%,8px);transition:opacity 160ms ease,transform 380ms cubic-bezier(.22,1,.36,1);font-family:Acorn,Georgia,serif;font-size:17px;font-weight:600;color:var(--green)}
+    .card-shell.is-active .video-hint{opacity:1;transform:translate(-50%,0)}
+    @keyframes burst{0%{opacity:1;transform:translate(0,0) scale(1) rotate(0)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.3) rotate(180deg)}}
+    @media(max-width:1020px) and (min-width:721px){.surface{min-height:430px}.deck{transform:scale(.67);transform-origin:center}.hint{z-index:40}}
+    @media(max-width:720px){.stage{padding:10px}.surface{min-height:470px;border-radius:14px}.hint{left:16px;top:14px}.deck{inset:38px 0 0;justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;padding:38px 16px 30px;scrollbar-width:none}.deck::-webkit-scrollbar{display:none}.card-shell{width:82vw;height:386px;flex-basis:82vw;margin-right:12px;scroll-snap-align:center;transform:rotate(var(--rotation));opacity:1!important}.card-shell:last-child{margin-right:16px}.card{width:min(320px,76vw)}.reveal,.video-hint{display:none}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.card-shell{transform:rotate(var(--rotation))!important}.card-shell.is-active .card{transform:none}}
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="surface" aria-label="叠放式导航卡片">
+      <p class="hint">Selected pathways</p>
+      <div class="deck" id="deck">
+        <div class="card-shell" data-rotation="6.5" tabindex="0">
+          <div class="reveal" aria-hidden="true"><div class="confetti"><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="mini" style="--mini:#d9ecff">AI</span><span class="mini" style="--mini:#f7f3ec">UX</span><span class="mini" style="--mini:#fbe7f2">Data</span></div>
+          <article class="card" style="--card-color:var(--orange)"><div class="card-content"><div><h2>Recent work</h2><p class="description">See how I turn messy product problems into shipped experiences.</p></div><a class="cta" href="#work">Read Case Studies</a></div></article>
+        </div>
+        <div class="card-shell" data-rotation="-5" tabindex="0">
+          <p class="video-hint">In case you are tired of reading</p>
+          <article class="card media-card"><div class="media"><div class="media-grid"><span>AI</span><span>UX</span><span>Data</span><span>Build</span></div><button class="play" type="button" aria-label="播放介绍">&#9654;</button></div></article>
+        </div>
+        <div class="card-shell" data-rotation="5" tabindex="0">
+          <div class="reveal" aria-hidden="true"><div class="confetti"><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="mini" style="--mini:#f8e9d3">Mood</span><span class="mini" style="--mini:#f2e8fb">Flow</span><span class="mini" style="--mini:#e3f0ec">Apps</span></div>
+          <article class="card" style="--card-color:var(--purple)"><div class="card-content"><div><h2>Indie apps</h2><p class="description">I've shipped 20+ indie apps over the last decade, mostly because I can't stop building.</p></div><a class="cta" href="#apps">What I've Shipped</a></div></article>
+        </div>
+        <div class="card-shell" data-rotation="-5" tabindex="0">
+          <div class="reveal" aria-hidden="true"><div class="confetti"><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="mini" style="--mini:#e8eef4">Tokyo</span><span class="mini" style="--mini:#f3e7d9">AI</span><span class="mini" style="--mini:#eadff7">Growth</span></div>
+          <article class="card" style="--card-color:var(--blue)"><div class="card-content"><div><h2>Public talks</h2><p class="description">I speak about design, growth, AI, and the craft behind building better products.</p></div><a class="cta" href="#talks">Explore My Talks</a></div></article>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const shells=[...document.querySelectorAll('.card-shell')];
+    const desktop=matchMedia('(min-width:721px)');
+    function render(active=null){shells.forEach((shell,index)=>{const base=Number(shell.dataset.rotation);const distance=active===null?0:Math.abs(index-active);let x=0,scale=1,opacity=1,rotation=base,z=shells.length-index;if(active!==null){if(index===active){x=index===shells.length-1?-120:0;scale=1.04;rotation=base*.2;z=10}else{x=Math.sign(index-active)*(140+28*distance);scale=.93;opacity=.5}shell.classList.toggle('is-active',index===active)}else{shell.classList.remove('is-active')}shell.style.setProperty('--x',desktop.matches?`${x}px`:'0px');shell.style.setProperty('--scale',desktop.matches?scale:1);shell.style.setProperty('--opacity',desktop.matches?opacity:1);shell.style.setProperty('--rotation',`${rotation}deg`);shell.style.setProperty('--z',z)})}
+    shells.forEach((shell,index)=>{shell.addEventListener('pointerenter',()=>render(index));shell.addEventListener('pointerleave',()=>{if(!shell.matches(':focus-within'))render()});shell.addEventListener('focusin',()=>render(index));shell.addEventListener('focusout',event=>{if(!shell.contains(event.relatedTarget))render()});shell.addEventListener('click',()=>render(index))});
+    document.querySelectorAll('a[href^="#"],.play').forEach(control=>control.addEventListener('click',event=>event.preventDefault()));
+    desktop.addEventListener('change',()=>render());
+    render();
+  </script>
+</body>
+</html>

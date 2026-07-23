@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Labs 圆周倾斜卡片轮播</title>
+  <style>
+    * { box-sizing: border-box; }
+    @property --morph-twist { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+    :root { color-scheme: light; }
+    body { margin: 0; font-family: "Google Sans", Arial, "PingFang SC", sans-serif; color: #28262b; }
+    button, a { font: inherit; }
+    .labs-carousel {
+      --accent: #f3a8ef;
+      --accent-soft: #fde8fc;
+      --shape-color: #ffbdf9;
+      --shapes-rot: 0deg;
+      --surface: #fff;
+      position: relative;
+      min-height: 620px;
+      overflow: hidden;
+      background: #fff5fe;
+      isolation: isolate;
+      transition: background-color .45s ease;
+    }
+    .bg-shapes {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      perspective: 1200px;
+      pointer-events: none;
+    }
+    .bg-shapes__slot {
+      --slot-size: clamp(310px, 43vw, 550px);
+      --slot-tilt: 0deg;
+      --slot-rot-sign: 1;
+      position: absolute;
+      width: var(--slot-size);
+      aspect-ratio: 1;
+      translate: -50% -50%;
+      rotate: calc(var(--slot-tilt) + var(--slot-rot-sign) * var(--morph-twist, 0deg));
+      transform: rotateY(var(--shapes-rot));
+      transform-style: preserve-3d;
+      transition: transform .9s cubic-bezier(.65,0,.35,1);
+    }
+    .bg-shapes__slot.is-morphing { animation: shape-morph .9s cubic-bezier(.65,0,.35,1); }
+    .bg-shapes__slot:nth-child(1) { top: 20%; left: 80%; --slot-tilt: -18deg; --slot-rot-sign: 1; }
+    .bg-shapes__slot:nth-child(2) { top: 42%; left: 7%; --slot-tilt: 22deg; --slot-rot-sign: -1; }
+    .bg-shapes__slot:nth-child(3) { top: 71%; left: 94%; --slot-tilt: -25deg; --slot-rot-sign: 1; }
+    .bg-shapes__slot:nth-child(4) { top: 84%; left: 15%; --slot-tilt: 0deg; --slot-rot-sign: -1; }
+    .background-shape {
+      display: block;
+      width: 100%;
+      height: 100%;
+      color: var(--shape-color);
+      will-change: transform;
+      transition: color .45s ease;
+      animation-composition: add, add, add;
+    }
+    .bg-shapes__slot:nth-child(1) .background-shape { --float-x: 56px; --float-y: 72px; --float-r: 18deg; animation: float-x 8s ease-in-out -1.3s infinite, float-y 14.64s ease-in-out -4.7s infinite, float-r 11.6s ease-in-out -2.9s infinite; }
+    .bg-shapes__slot:nth-child(2) .background-shape { --float-x: -64px; --float-y: 58px; --float-r: -16deg; animation: float-x 9.5s ease-in-out -3.8s infinite, float-y 17.39s ease-in-out -8.1s infinite, float-r 13.78s ease-in-out -6.3s infinite; }
+    .bg-shapes__slot:nth-child(3) .background-shape { --float-x: 72px; --float-y: 78px; --float-r: 20deg; animation: float-x 10.5s ease-in-out -5.2s infinite, float-y 19.22s ease-in-out -2.4s infinite, float-r 15.23s ease-in-out -9.6s infinite; }
+    .bg-shapes__slot:nth-child(4) .background-shape { --float-x: -54px; --float-y: 86px; --float-r: -18deg; animation: float-x 8.5s ease-in-out -7.4s infinite, float-y 15.56s ease-in-out -1.1s infinite, float-r 12.33s ease-in-out -5.8s infinite; }
+    .shape-path { opacity: 0; transition: opacity .26s cubic-bezier(.4,0,.2,1) .28s; }
+    .shape-path.is-active { opacity: 1; }
+    @keyframes float-x { 0%,100% { transform: translateX(0); } 25% { transform: translateX(var(--float-x)); } 75% { transform: translateX(calc(var(--float-x) * -1)); } }
+    @keyframes float-y { 0%,100% { transform: translateY(0); } 25% { transform: translateY(var(--float-y)); } 75% { transform: translateY(calc(var(--float-y) * -1)); } }
+    @keyframes float-r { 0%,100% { transform: rotate(0); } 25% { transform: rotate(var(--float-r)); } 75% { transform: rotate(calc(var(--float-r) * -1)); } }
+    @keyframes shape-morph { 0% { scale: 1; opacity: 1; filter: blur(0); --morph-twist: 0deg; } 45% { scale: .85; opacity: .35; filter: blur(5px); --morph-twist: 3deg; } 100% { scale: 1; opacity: 1; filter: blur(0); --morph-twist: 0deg; } }
+    .labs-heading { position: relative; z-index: 3; margin: 0; padding: 30px 24px 0; text-align: center; font-size: clamp(24px,4vw,44px); line-height: 1.08; font-weight: 500; letter-spacing: 0; }
+    .carousel-window { position: relative; z-index: 2; height: 440px; overflow: hidden; outline: none; }
+    .orbit-track {
+      --position: 0;
+      position: absolute;
+      left: 50%;
+      top: -178px;
+      width: 5200px;
+      height: 5200px;
+      border-radius: 50%;
+      transform: translateX(-50%) rotate(calc(var(--position) * -7deg));
+      transform-origin: 50% 50%;
+      transition: transform .72s cubic-bezier(.22,.7,.18,1);
+      will-change: transform;
+    }
+    .orbit-track.no-transition { transition: none; }
+    .orbit-item {
+      --slot: 0;
+      position: absolute;
+      left: calc(50% - 130px);
+      top: 178px;
+      width: 260px;
+      height: 392px;
+      transform-origin: 50% 2422px;
+      transform: rotate(calc(var(--slot) * 7deg));
+    }
+    .experiment-card {
+      width: 100%;
+      height: 100%;
+      padding: 17px;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      box-shadow: 0 3px 13px rgba(54,35,57,.05);
+      color: #2b292d;
+      text-decoration: none;
+      transition: box-shadow .3s ease, transform .3s ease;
+    }
+    .orbit-item.is-center .experiment-card { box-shadow: 0 15px 38px rgba(74,43,76,.14); }
+    .experiment-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(74,43,76,.18); }
+    .card-media { width: 100%; aspect-ratio: 1.08; overflow: hidden; border-radius: 13px; background: #e5e6df; }
+    .card-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .card-copy { min-height: 0; padding: 16px 2px 0; display: flex; flex: 1; flex-direction: column; }
+    .card-copy h2 { margin: 0; font-size: 21px; line-height: 1.15; font-weight: 500; letter-spacing: 0; }
+    .card-copy p { margin: 8px 0 0; color: #59555b; font-size: 12px; line-height: 1.42; }
+    .card-copy span { margin-top: auto; color: #59555b; font-size: 11px; }
+    .card-copy span::after { content: " →"; }
+    .carousel-controls { position: absolute; z-index: 5; left: 50%; bottom: 119px; transform: translateX(-50%); display: flex; gap: 8px; }
+    .arrow-button {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid color-mix(in srgb,var(--accent) 50%,#fff);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.52);
+      color: #343037;
+      cursor: pointer;
+      transition: background-color .18s, transform .18s;
+    }
+    .arrow-button:hover { background: #fff; transform: translateY(-2px); }
+    .arrow-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .categories { position: absolute; z-index: 5; left: 50%; bottom: 28px; transform: translateX(-50%); width: min(100% - 24px,680px); display: flex; justify-content: center; gap: 8px; }
+    .category-button { min-width: 92px; height: 46px; padding: 0 22px; border: 0; border-radius: 24px; background: rgba(255,255,255,.5); color: #373238; font-size: 14px; cursor: pointer; transition: background-color .25s, transform .2s; }
+    .category-button:hover { transform: translateY(-2px); }
+    .category-button[aria-pressed="true"] { background: var(--accent); font-weight: 500; }
+    .position-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    @media (max-width: 640px) {
+      .labs-carousel { min-height: 570px; }
+      .labs-heading { padding-top: 24px; font-size: 26px; }
+      .carousel-window { height: 400px; }
+      .orbit-track { top: -200px; }
+      .orbit-item { left: calc(50% - 112px); top: 200px; width: 224px; height: 344px; }
+      .experiment-card { padding: 14px; border-radius: 16px; }
+      .card-media { border-radius: 11px; }
+      .card-copy { padding-top: 13px; }
+      .card-copy h2 { font-size: 18px; }
+      .card-copy p { font-size: 11px; }
+      .carousel-controls { bottom: 112px; }
+      .categories { bottom: 20px; justify-content: flex-start; overflow-x: auto; padding: 0 10px 4px; scrollbar-width: none; }
+      .categories::-webkit-scrollbar { display: none; }
+      .category-button { flex: 0 0 auto; min-width: 76px; height: 42px; padding: 0 17px; font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .orbit-track, .experiment-card, .arrow-button, .category-button, .bg-shapes__slot, .shape-path { transition-duration: .01ms; }
+      .background-shape, .bg-shapes__slot.is-morphing { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <section class="labs-carousel" data-theme="create" aria-label="Google Labs 圆周卡片轮播">
+    <div class="bg-shapes" aria-hidden="true">
+      <div class="bg-shapes__slot"></div>
+      <div class="bg-shapes__slot"></div>
+      <div class="bg-shapes__slot"></div>
+      <div class="bg-shapes__slot"></div>
+    </div>
+    <h1 class="labs-heading">Be the first to create</h1>
+    <div class="carousel-window" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Create tools，使用左右方向键切换">
+      <div class="orbit-track" id="orbitTrack"></div>
+    </div>
+    <div class="carousel-controls" aria-label="轮播导航">
+      <button class="arrow-button" data-direction="-1" aria-label="上一张">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button class="arrow-button" data-direction="1" aria-label="下一张">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="categories" role="tablist" aria-label="筛选分类">
+      <button class="category-button" data-category="all" role="tab" aria-pressed="false">All</button>
+      <button class="category-button" data-category="create" role="tab" aria-pressed="true">Create</button>
+      <button class="category-button" data-category="develop" role="tab" aria-pressed="false">Develop</button>
+      <button class="category-button" data-category="explore" role="tab" aria-pressed="false">Explore</button>
+      <button class="category-button" data-category="learn" role="tab" aria-pressed="false">Learn</button>
+    </div>
+    <p class="position-status" aria-live="polite"></p>
+  </section>
+  <script src="./demo.js"></script>
+</body>
+</html>

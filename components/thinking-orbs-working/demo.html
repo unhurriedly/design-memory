@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>点阵轨道 AI 思考图标 - 六状态</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root { color-scheme: light; }
+    body { margin: 0; background: #fff; color: #171717; font-family: Inter, Arial, "PingFang SC", sans-serif; }
+    button { font: inherit; }
+    .thinking-orb-demo { --line: #deded9; min-height: 560px; overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+    .orb-toolbar { min-height: 54px; padding: 8px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; background: #fafaf8; }
+    .orb-toolbar strong { font-size: 12px; }
+    .mode-code { padding: 5px 8px; border: 1px solid var(--line); border-radius: 5px; color: #777773; font: 10px/1.2 ui-monospace, monospace; }
+    .orb-controls { margin-left: auto; padding: 3px; display: flex; gap: 2px; border: 1px solid var(--line); border-radius: 7px; background: #efefec; }
+    .orb-controls button { min-width: 36px; height: 28px; padding: 0 9px; border: 0; border-radius: 4px; background: transparent; color: #696965; font-size: 11px; cursor: pointer; }
+    .orb-controls button[aria-pressed="true"] { background: #fff; color: #171717; box-shadow: 0 1px 4px rgba(20,20,18,.12); }
+    .state-tabs { padding: 9px 12px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; background: #fff; }
+    .state-tabs button { min-width: 0; height: 34px; padding: 0 6px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: #777773; font-size: 10px; cursor: pointer; white-space: nowrap; }
+    .state-tabs button:hover { background: #f5f5f2; color: #171717; }
+    .state-tabs button[aria-pressed="true"] { border-color: #d7d7d2; background: #f1f1ee; color: #171717; font-weight: 600; }
+    .orb-stage { min-height: 450px; padding: clamp(28px, 6vw, 64px); display: grid; grid-template-columns: minmax(200px, .9fr) minmax(280px, 1.1fr); align-items: center; gap: clamp(30px, 8vw, 88px); transition: background .25s, color .25s; }
+    .orb-stage[data-theme="light"] { background: #fff; color: #171717; }
+    .orb-stage[data-theme="dark"] { background: #171717; color: #f6f6f2; }
+    .orb-focus { width: 220px; height: 220px; display: grid; place-items: center; border: 1px solid color-mix(in srgb, currentColor 10%, transparent); border-radius: 50%; }
+    .orb-focus canvas { width: 144px; height: 144px; image-rendering: auto; }
+    .orb-status > p { margin: 0 0 16px; font: 500 11px/16px ui-monospace, monospace; opacity: .48; }
+    .status-line { min-height: 28px; display: flex; align-items: center; gap: 10px; }
+    .status-line canvas { width: 20px; height: 20px; flex: 0 0 20px; }
+    .status-line strong { font-size: 16px; font-weight: 500; }
+    .status-line span { font: 12px/1.2 ui-monospace, monospace; opacity: .5; }
+    .orb-status small { display: block; min-height: 70px; margin-top: 24px; padding-top: 20px; border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); font-size: 14px; line-height: 1.7; opacity: .76; }
+    .algorithm-note { margin: 16px 0 0; color: inherit; font: 10px/1.5 ui-monospace, monospace; opacity: .44; }
+    @media (max-width: 700px) {
+      .state-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .orb-stage { min-height: 520px; padding: 34px 24px; grid-template-columns: 1fr; gap: 34px; }
+      .orb-focus { width: 190px; height: 190px; margin: auto; }
+    }
+    @media (max-width: 430px) {
+      .orb-toolbar { align-items: flex-start; flex-wrap: wrap; }
+      .orb-controls { order: 3; width: 100%; margin: 0; }
+      .orb-controls button { flex: 1; }
+      .state-tabs { padding: 8px; gap: 3px; }
+      .state-tabs button { font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .orb-stage { transition: none; } }
+  </style>
+</head>
+<body>
+  <section class="thinking-orb-demo" aria-label="点阵轨道 AI 思考图标六状态演示">
+    <header class="orb-toolbar">
+      <strong>Thinking Orbs</strong>
+      <code class="mode-code" id="modeCode">working / orbits</code>
+      <div class="orb-controls">
+        <button data-orb-theme="light" aria-pressed="true">浅色</button>
+        <button data-orb-theme="dark" aria-pressed="false">深色</button>
+        <button id="orbPause" aria-label="暂停动画" aria-pressed="false">Ⅱ</button>
+      </div>
+    </header>
+
+    <nav class="state-tabs" aria-label="AI 状态">
+      <button data-state="working" aria-pressed="true">Working</button>
+      <button data-state="searching" aria-pressed="false">Searching</button>
+      <button data-state="solving" aria-pressed="false">Solving</button>
+      <button data-state="listening" aria-pressed="false">Listening</button>
+      <button data-state="composing" aria-pressed="false">Composing</button>
+      <button data-state="shaping" aria-pressed="false">Shaping</button>
+    </nav>
+
+    <div class="orb-stage" data-theme="light">
+      <div class="orb-focus"><canvas data-size="64" role="img" aria-label="Working 动效图标"></canvas></div>
+      <div class="orb-status">
+        <p>AGENT STATUS · LIVE DEMO LABEL</p>
+        <div class="status-line">
+          <canvas data-size="20" role="img" aria-label="Working 行内动效图标"></canvas>
+          <strong id="statusLabel">Working</strong>
+          <span id="stateName">working</span>
+        </div>
+        <small id="statusDescription">多组倾斜轨道与运动粒子表达持续执行中的任务。</small>
+        <p class="algorithm-note" id="algorithmNote">12 orbits · ghost paths · depth-sorted particles</p>
+      </div>
+    </div>
+  </section>
+  <script src="./demo.js"></script>
+</body>
+</html>
