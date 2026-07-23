@@ -1,10 +1,6 @@
 <p align="center">
-  <img src="assets/brand/sheji-design-memory-logo-v2.png" width="152" alt="设记 Design Memory 标志">
+  <img src="./ChatGPT%20Image%202026年7月23日%2016_29_14.png" width="760" alt="设记 Design Memory 品牌标志与项目口号">
 </p>
-
-<h1 align="center">设记 Design Memory</h1>
-
-<p align="center">把喜欢的设计转化为 AI 和前端开发可复用的长期记忆。</p>
 
 <p align="center">
   <a href="https://unhurriedly.github.io/design-memory/"><strong>在线访问</strong></a>
