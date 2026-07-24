@@ -864,124 +864,77 @@ titleSize.addEventListener("input",()=>{
   titleOutput.value=titleSize.value+"px";
 });`;
 
-const vibeIslandAskHtml = String.raw`<section class="agent-island-demo" aria-label="AI Agent 灵动岛询问面板">
-  <div class="agent-island" data-state="ask">
-    <div class="island-layer island-compact" data-layer="compact">
-      <span class="agent-name"><i></i>Claude</span><span>Working</span>
+const vibeIslandAskHtml = String.raw`<section class="agent-island-demo" aria-label="AI Agent 灵动岛四状态面板">
+  <div class="agent-island" data-state="overview">
+    <div class="island-layer overview is-active" data-layer="overview">
+      <div class="usage"><b>5h</b><strong>11%</strong><span>4h1m</span><i>|</i><b>7d</b><strong>2%</strong><span>6h1m</span></div>
+      <article class="session hero"><span class="pet">●</span><div><p>fix auth bug <small>Claude · iTerm · 27m</small></p><span>You: fix the token validation before deploy</span></div></article>
+      <article class="session"><i></i><p>landing page motion</p><small>Codex · Cursor · 12m</small></article>
+      <article class="session"><i class="working"></i><p>search indexing</p><small>Gemini · Ghostty · 5h</small></article>
     </div>
-    <div class="island-layer island-ask is-active" data-layer="ask">
-      <div class="ask-head"><span>?</span> Claude asks</div>
-      <div class="ask-question">Which deployment target?</div>
-      <div class="ask-options">
-        <button data-value="Production"><kbd>⌘1</kbd>Production</button>
-        <button data-value="Staging"><kbd>⌘2</kbd>Staging</button>
-        <button data-value="Local only"><kbd>⌘3</kbd>Local only</button>
-      </div>
+    <div class="island-layer approval" data-layer="approval">
+      <header><i></i>Permission Request</header>
+      <p class="tool"><b>⚠ Edit</b> src/auth/middleware.ts</p>
+      <div class="diff"><span>12 const verify = (token) =&gt;</span><del>13 - jwt.verify(token);</del><ins>13 + if (!token) throw new</ins><ins>14 + &nbsp; AuthError('missing');</ins></div>
+      <footer><button data-decision="Denied">Deny <kbd>⌘N</kbd></button><button class="allow" data-decision="Approved">Allow <kbd>⌘Y</kbd></button></footer>
+    </div>
+    <div class="island-layer ask" data-layer="ask">
+      <header>▰ Claude asks</header><p>Which deployment target?</p>
+      <div class="ask-options"><button data-value="Production"><kbd>⌘1</kbd>Production</button><button data-value="Staging"><kbd>⌘2</kbd>Staging</button><button data-value="Local only"><kbd>⌘3</kbd>Local only</button></div>
+    </div>
+    <div class="island-layer jump" data-layer="jump">
+      <div class="usage"><b>5h</b><strong>11%</strong><span>4h1m</span><i>|</i><b>7d</b><strong>2%</strong><span>6h1m</span></div>
+      <button class="session hero highlight" data-jump="fix auth bug"><span class="pet">●</span><div><p>fix auth bug <small>Claude · iTerm · 28m</small></p><span>Done — click to jump</span></div></button>
+      <button class="session" data-jump="landing page motion"><i></i><p>landing page motion</p><small>Codex · Cursor · 13m</small></button>
+      <button class="session" data-jump="search indexing"><i class="working"></i><p>search indexing</p><small>Gemini · Ghostty · 5h</small></button>
     </div>
   </div>
-  <div class="state-switch" aria-label="组件状态">
-    <button data-show="compact" aria-pressed="false">紧凑</button>
-    <button data-show="ask" aria-pressed="true">询问</button>
-  </div>
+  <nav class="state-switch" aria-label="组件状态">
+    <button data-show="overview" aria-pressed="true">总览</button><button data-show="approval" aria-pressed="false">批准</button><button data-show="ask" aria-pressed="false">询问</button><button data-show="jump" aria-pressed="false">跳回</button>
+  </nav>
   <p class="selection" aria-live="polite"></p>
 </section>`;
 
 const vibeIslandAskCss = String.raw`* { box-sizing: border-box; }
 button { font: inherit; }
-.agent-island-demo {
-  --cyan: #06b6d4;
-  --spring: cubic-bezier(.175,.885,.32,1.1);
-  position: relative;
-  min-height: 420px;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  background: linear-gradient(145deg,#eef4f7,#cbd8df);
-  font-family: -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
-}
-.agent-island {
-  position: relative;
-  width: 260px;
-  height: 40px;
-  overflow: visible;
-  border-radius: 0 0 10px 10px;
-  background: #000;
-  color: #e5e5e5;
-  box-shadow: 0 2px 8px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.3);
-  transition: width .5s var(--spring),height .5s var(--spring),border-radius .4s ease-out;
-}
-.agent-island::before,.agent-island::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: 13px;
-  height: 25px;
-  pointer-events: none;
-}
-.agent-island::before { left: -13px; border-radius: 0 6px 0 0; box-shadow: 5px 0 0 #000; }
-.agent-island::after { right: -13px; border-radius: 6px 0 0 0; box-shadow: -5px 0 0 #000; }
-.agent-island[data-state="ask"] { width: 340px; height: 160px; border-radius: 0 0 14px 14px; }
-.island-layer {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  opacity: 0;
-  transform: scale(.96);
-  filter: blur(2px);
-  pointer-events: none;
-  transition: opacity .25s,filter .3s,transform .35s var(--spring);
-}
-.island-layer.is-active { opacity: 1; transform: scale(1); filter: none; pointer-events: auto; transition-delay: .06s; }
-.island-compact { padding: 0 14px; display: flex; align-items: center; justify-content: space-between; color: rgba(255,255,255,.55); font-size: 11px; }
-.agent-name { display: flex; align-items: center; gap: 7px; color: #fff; }
-.agent-name i { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px rgba(6,182,212,.8); }
-.island-ask { padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
-.ask-head { display: flex; align-items: center; gap: 5px; color: var(--cyan); font-size: 10px; font-weight: 600; line-height: 16px; }
-.ask-head span { width: 12px; height: 12px; border: 1.5px solid currentColor; border-radius: 50%; display: grid; place-items: center; font-size: 8px; }
-.ask-question { color: rgba(255,255,255,.9); font-size: 11px; font-weight: 500; line-height: 17.6px; }
-.ask-options { display: flex; flex-direction: column; gap: 3px; }
-.ask-options button { width: 100%; height: 28px; padding: 5px 10px; border: 0; border-radius: 6px; display: flex; align-items: center; gap: 8px; background: rgba(6,182,212,.15); color: rgba(255,255,255,.9); font-size: 10px; cursor: pointer; transition: background .15s,transform .15s; }
-.ask-options button:hover,.ask-options button:focus-visible { outline: 0; background: rgba(6,182,212,.3); transform: translateX(2px); }
-.ask-options button.is-selected { background: rgba(6,182,212,.42); }
-.ask-options kbd { width: 18px; height: 18px; border-radius: 4px; display: grid; place-items: center; background: rgba(6,182,212,.6); color: #fff; font: 700 9px/1 ui-monospace,monospace; opacity: .72; }
-.state-switch { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 4px; display: flex; gap: 3px; border-radius: 8px; background: rgba(248,251,252,.82); }
-.state-switch button { height: 28px; padding: 0 12px; border: 0; border-radius: 5px; background: transparent; color: #51636d; font-size: 11px; cursor: pointer; }
-.state-switch button[aria-pressed="true"] { background: #fff; color: #10232e; box-shadow: 0 1px 5px rgba(30,49,59,.14); }
-.selection { position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%); margin: 0; color: #2c4a58; font-size: 11px; }
-@media (max-width: 420px) { .agent-island[data-state="ask"] { width: calc(100vw - 28px); } }
-@media (prefers-reduced-motion: reduce) { .agent-island,.island-layer,.ask-options button { transition-duration: .01ms; } }`;
+.agent-island-demo { --idle:#22c55e;--work:#3b82f6;--alert:#f97316;--question:#06b6d4;--spring:cubic-bezier(.175,.885,.32,1.1);position:relative;min-height:430px;overflow:hidden;display:flex;justify-content:center;background:linear-gradient(145deg,#eef4f7,#cbd8df);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif; }
+.agent-island { position:relative;width:380px;height:175px;overflow:visible;border-radius:0 0 14px 14px;background:#000;color:#e5e5e5;box-shadow:0 2px 8px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.3);transition:width .5s var(--spring),height .5s var(--spring),box-shadow .4s; }
+.agent-island::before,.agent-island::after { content:"";position:absolute;top:0;width:13px;height:25px;pointer-events:none; }
+.agent-island::before { left:-13px;border-radius:0 6px 0 0;box-shadow:5px 0 0 #000; }
+.agent-island::after { right:-13px;border-radius:6px 0 0 0;box-shadow:-5px 0 0 #000; }
+.agent-island[data-state="overview"],.agent-island[data-state="jump"] { width:380px;height:175px; }
+.agent-island[data-state="approval"] { width:380px;height:220px;box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 20px rgba(249,115,22,.15); }
+.agent-island[data-state="ask"] { width:340px;height:165px;box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 20px rgba(6,182,212,.15); }
+.island-layer { position:absolute;inset:0;overflow:hidden;border-radius:inherit;opacity:0;filter:blur(6px);transform:scale(.96);pointer-events:none;transition:opacity .25s,filter .3s,transform .35s var(--spring); }
+.island-layer.is-active { opacity:1;filter:none;transform:scale(1);pointer-events:auto;transition-delay:.06s; }
+.overview,.jump { padding:10px 12px;display:flex;flex-direction:column;gap:3px; }
+.usage { height:17px;padding:2px 8px;display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.4);font:9.5px/1 ui-monospace,monospace; }.usage b{color:rgba(255,255,255,.82)}.usage strong{color:#57d977}.usage i{color:rgba(255,255,255,.22);font-style:normal}
+.session { min-height:31px;padding:5px 8px;border:0;border-radius:6px;display:flex;align-items:center;gap:8px;background:transparent;color:inherit;text-align:left; }.session.hero{min-height:47px;padding:8px}.session.highlight{background:rgba(255,255,255,.06)}button.session{width:100%;cursor:pointer}.session:hover{background:rgba(255,255,255,.08)}
+.session p{min-width:0;flex:1;margin:0;overflow:hidden;color:#fff;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.session p small,.session small{color:rgba(255,255,255,.45);font-size:9px}.session span{color:rgba(255,255,255,.4);font-size:10px}.jump .hero span:last-child{color:#4ade80}.session>i{width:6px;height:6px;border-radius:50%;background:var(--idle)}.session>i.working{background:var(--work)}.pet{color:var(--idle)!important}
+.approval { padding:12px 14px;display:flex;flex-direction:column;gap:6px; }.approval header{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.4);font-size:11px}.approval header i{width:6px;height:6px;border-radius:50%;background:var(--alert);animation:pulse 1.5s infinite}.tool{margin:0;overflow:hidden;color:rgba(255,255,255,.85);font:11px/1 ui-monospace,monospace;text-overflow:ellipsis;white-space:nowrap}.tool b{color:var(--alert)}
+.diff { padding:3px 0;overflow:hidden;border-radius:4px;background:rgba(255,255,255,.04);font:9px/1.6 ui-monospace,monospace; }.diff span,.diff del,.diff ins{padding:0 6px;display:block;text-decoration:none}.diff span{color:rgba(255,255,255,.5)}.diff del{color:#fca5a5;background:rgba(249,115,22,.08)}.diff ins{color:#4ade80;background:rgba(34,197,94,.08)}
+.approval footer { margin-top:auto;display:flex;gap:6px; }.approval footer button{height:27px;flex:1;border:0;border-radius:6px;background:rgba(255,255,255,.15);color:#fff;font-size:10px}.approval footer .allow{background:rgba(255,255,255,.9);color:#000}.approval kbd{font-size:8px;opacity:.5}
+.ask { padding:12px 14px;display:flex;flex-direction:column;gap:6px; }.ask header{color:var(--question);font-size:10px;font-weight:600}.ask>p{margin:0;color:rgba(255,255,255,.9);font-size:11px}.ask-options{display:flex;flex-direction:column;gap:3px}.ask-options button{height:28px;padding:5px 10px;border:0;border-radius:6px;display:flex;align-items:center;gap:8px;background:rgba(6,182,212,.15);color:rgba(255,255,255,.9);font-size:10px}.ask-options button:hover,.ask-options button.is-selected{background:rgba(6,182,212,.35)}.ask-options kbd{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;background:rgba(6,182,212,.6);font-size:9px}
+.state-switch { position:absolute;left:50%;bottom:24px;transform:translateX(-50%);padding:4px;display:flex;gap:3px;border-radius:8px;background:rgba(248,251,252,.82); }.state-switch button{height:28px;padding:0 12px;border:0;border-radius:5px;background:transparent;color:#51636d;font-size:11px}.state-switch button[aria-pressed="true"]{background:#fff;color:#10232e;box-shadow:0 1px 5px rgba(30,49,59,.14)}
+.selection { position:absolute;left:50%;bottom:66px;transform:translateX(-50%);margin:0;color:#2c4a58;font-size:11px; }
+@keyframes pulse{50%{opacity:.4}}
+@media(max-width:420px){.agent-island[data-state="overview"],.agent-island[data-state="approval"],.agent-island[data-state="jump"]{width:calc(100vw - 28px)}.agent-island[data-state="ask"]{width:calc(100vw - 42px)}.state-switch{width:calc(100% - 20px)}.state-switch button{min-width:0;flex:1;padding:0 3px}}
+@media(prefers-reduced-motion:reduce){.agent-island,.island-layer{transition-duration:.01ms}.approval header i{animation:none}}`;
 
-const vibeIslandAskJs = String.raw`const island = document.querySelector(".agent-island");
-const layers = [...document.querySelectorAll("[data-layer]")];
-const stateButtons = [...document.querySelectorAll("[data-show]")];
-const options = [...document.querySelectorAll(".ask-options button")];
-const selection = document.querySelector(".selection");
+const vibeIslandAskJs = String.raw`const island=document.querySelector(".agent-island");
+const layers=[...document.querySelectorAll("[data-layer]")];
+const stateButtons=[...document.querySelectorAll("[data-show]")];
+const options=[...document.querySelectorAll(".ask-options button")];
+const selection=document.querySelector(".selection");
 let resetTimer;
-
-function setState(state) {
-  island.dataset.state = state;
-  layers.forEach((layer) => layer.classList.toggle("is-active", layer.dataset.layer === state));
-  stateButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.show === state)));
-}
-
-function choose(option) {
-  clearTimeout(resetTimer);
-  options.forEach((item) => item.classList.toggle("is-selected", item === option));
-  selection.textContent = "Selected: " + option.dataset.value;
-  resetTimer = setTimeout(() => {
-    options.forEach((item) => item.classList.remove("is-selected"));
-    selection.textContent = "";
-  }, 1400);
-}
-
-stateButtons.forEach((button) => button.addEventListener("click", () => setState(button.dataset.show)));
-options.forEach((option) => option.addEventListener("click", () => choose(option)));
-window.addEventListener("keydown", (event) => {
-  if (island.dataset.state !== "ask") return;
-  const index = Number(event.key) - 1;
-  if (index >= 0 && index < options.length) choose(options[index]);
-});`;
+function announce(message){clearTimeout(resetTimer);selection.textContent=message;resetTimer=setTimeout(()=>selection.textContent="",1600)}
+function setState(state){island.dataset.state=state;layers.forEach(layer=>layer.classList.toggle("is-active",layer.dataset.layer===state));stateButtons.forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.show===state)))}
+function choose(option){options.forEach(item=>item.classList.toggle("is-selected",item===option));announce("Selected: "+option.dataset.value)}
+stateButtons.forEach(button=>button.addEventListener("click",()=>setState(button.dataset.show)));
+options.forEach(option=>option.addEventListener("click",()=>choose(option)));
+document.querySelectorAll("[data-decision]").forEach(button=>button.addEventListener("click",()=>announce(button.dataset.decision+": src/auth/middleware.ts")));
+document.querySelectorAll("[data-jump]").forEach(button=>button.addEventListener("click",()=>announce("Jumped to: "+button.dataset.jump)));
+window.addEventListener("keydown",event=>{if(island.dataset.state!=="ask")return;const index=Number(event.key)-1;if(index>=0&&index<options.length)choose(options[index])});`;
 
 export const assetTypes = [
   { id: "all", label: "全部资产", icon: "grid" },
@@ -1159,20 +1112,25 @@ export const seedAssets = [
     type: "interaction",
     status: "ready",
     favorite: false,
-    updatedAt: "2026-07-23",
-    preview: "./components/vibeisland-agent-question/demo.html",
-    description: "将 AI Agent 的待决策问题收纳到桌面顶部灵动岛中。面板从紧凑状态弹性展开，以青色身份提示、问题正文和三条带快捷键的选项，让用户不离开当前工作流即可完成选择。",
-    usage: "适用于 AI 编程助手、桌面 Agent、命令行工具、审批流，以及需要在不中断主任务的情况下快速回答单选问题的产品界面。",
-    implementation: "组件使用真实 DOM 而非视频：外层灵动岛负责 260×40px 紧凑态与 340×160px 询问态之间的尺寸变形。顶部左右各用一个 13×25px 伪元素，通过 6px 单侧圆角和朝主体方向的 5px 黑色 box-shadow 形成反内角；主体保持 overflow: visible，内部 compact / ask 图层单独裁切。图层通过 opacity、blur 和 scale 交叉切换。询问态包含三个真实 button，支持点击和数字键 1/2/3 选择；选中后短暂高亮并通过 aria-live 返回结果。尺寸过渡采用 500ms 弹性曲线 cubic-bezier(.175,.885,.32,1.1)，并为减少动态效果偏好提供降级。",
-    tags: ["AI", "灵动岛", "问题选择", "状态切换", "键盘快捷键"],
+    updatedAt: "2026-07-24",
+    preview: "./components/vibeisland-agent-question/demo.html?v=four-states-1",
+    description: "把多个 AI Agent 的运行信息、权限请求、问题选择和完成跳转集中到桌面顶部灵动岛。总览态扫描多个会话；批准态查看代码差异并允许或拒绝；询问态通过快捷选项回答 Agent；跳回态突出已完成任务并返回对应终端。四态使用绿色、橙色、青色和蓝色建立清晰的事件语义。",
+    usage: "适用于 AI 编程助手、桌面 Agent、命令行工具和审批流。可在不离开当前工作区的情况下查看多任务状态、处理高风险操作、回答单选问题并返回完成任务所在的终端或标签页。",
+    implementation: "组件使用真实 DOM 而非视频，原站为 overview、approval、ask、jump 准备四个独立图层，而不是复用同一层替换文案。总览与跳回均为 380×175px，采用用量行、一个展开会话和两个紧凑会话；跳回态将完成会话高亮并提供点击返回。批准态为 380×220px，使用橙色脉冲状态点、工具与文件路径、四行 diff、Deny/Allow 快捷按钮。询问态为 340×165px，使用青色标题和三个快捷选项。外层宽高以 500ms 弹性曲线变形，图层通过 opacity、6px blur 和 scale(.96→1) 交叉切换；顶部反内角由左右 13×25px 伪元素和 ±5px 黑色 box-shadow 形成。复现版保留四态按钮、批准反馈、问题选择、会话跳回、键盘数字选择、移动端宽度约束及 prefers-reduced-motion 降级。",
+    tags: ["AI", "灵动岛", "Agent 总览", "权限批准", "问题选择", "终端跳转", "状态切换", "键盘快捷键"],
     tokens: [
-      ["紧凑状态", "260px × 40px"],
-      ["询问状态", "340px × 160px"],
+      ["总览状态", "380px × 175px"],
+      ["批准状态", "380px × 220px"],
+      ["询问状态", "340px × 165px"],
+      ["跳回状态", "380px × 175px"],
       ["展开圆角", "0 0 14px 14px"],
       ["顶部反内角", "左右各 13px × 25px / 6px 单侧圆角"],
       ["反内角填充", "box-shadow: ±5px 0 0 #000"],
       ["面板背景", "#000000"],
-      ["强调色", "#06b6d4"],
+      ["总览/完成色", "#22c55e / #4ade80"],
+      ["批准强调色", "#f97316"],
+      ["询问强调色", "#06b6d4"],
+      ["运行强调色", "#3b82f6"],
       ["面板内边距", "12px 14px"],
       ["图层间距", "6px"],
       ["身份标签", "10px / 600 / 16px"],
@@ -1182,21 +1140,23 @@ export const seedAssets = [
       ["选项背景", "rgba(6,182,212,.15)"],
       ["选项间距", "3px"],
       ["尺寸过渡", "500ms cubic-bezier(.175,.885,.32,1.1)"],
-      ["图层进入", "opacity + blur + scale(.96→1) / 350ms"],
+      ["图层进入", "opacity + blur(6px→0) + scale(.96→1) / 350ms"],
       ["快捷键", "1 / 2 / 3（界面标记为 ⌘1 / ⌘2 / ⌘3）"]
     ],
     evidence: [
-      ["分析日期", "2026-07-23"],
+      ["分析日期", "2026-07-24"],
       ["分析来源", "Vibe Island 中文首页实时 DOM、计算样式、Astro 页面源码与用户截图"],
       ["用户截图", "730 × 348px；Claude asks / Which deployment target? / 三项选择"],
       ["代码确认", "页面存在 .v6-layer[data-layer='ask']、三个 .v6-ask-opt button 和 JavaScript 场景切换"],
       ["媒体排除", "实时 DOM 中 video: 0、source: 0、询问层 img: 0；HTML 未引用 mp4/webm/mov/gif"],
-      ["展开实测", ".v6-notch 为 340×160px，黑色背景，底部 14px 圆角"],
+      ["四态尺寸", "原站脚本 Te：overview 380×175、approval 380×220、ask 340×165、jump 380×175"],
       ["顶部反内角", ".v6-notch::before / ::after 均为 13×25px；单侧 6px 圆角配合 ±5px 黑色 box-shadow"],
       ["裁切关系", ".v6-notch 为 overflow: visible；内部 .v6-layer 为 overflow: hidden"],
       ["选项实测", "312×28px，6px 圆角，rgba(6,182,212,.15)，5px 10px 内边距"],
-      ["状态结构", "compact / overview / approval / ask / jump 五个 DOM 图层，active class 控制当前状态"],
-      ["场景控制", "页面中的“询问”是 button[data-state='ask']，点击后 ask 图层获得 .v6-layer-active"],
+      ["状态结构", "演示入口为 overview / approval / ask / jump 四个场景；每个场景对应独立 DOM 图层，.v6-layer-active 控制显示"],
+      ["总览与跳回", "均包含用量行、1 个展开会话和 2 个紧凑会话；jump 的完成会话使用 .v6-sess-hl 与 Done — click to jump"],
+      ["批准结构", "Permission Request、Edit 路径、四行代码 diff、Deny ⌘N 与 Allow ⌘Y"],
+      ["场景控制", ".v6-scene-pill[data-scene] 与 Dock button[data-state] 共同驱动四态；脚本按状态写入宽、高、圆角和阴影"],
       ["技术栈线索", "Astro 5.17.1 + 原生 HTML/CSS/JavaScript"],
       ["结论", "附件组件由前端代码实时渲染并交互，不是视频，因此符合收录条件"]
     ],

@@ -1,4 +1,4 @@
-import { assetTypes, seedAssets } from "./data/resources.js?v=google-labs-bg-8";
+import { assetTypes, seedAssets } from "./data/resources.js?v=vibe-four-states-1";
 
 const STORAGE_KEY = "shiguang-component-assets-v2";
 const LEGACY_KEY = "shiguang-design-library-v1";

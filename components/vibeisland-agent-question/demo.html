@@ -4,66 +4,92 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root{--cyan:#06b6d4;--ink:#050505;--spring:cubic-bezier(.175,.885,.32,1.1)}
+    :root{--idle:#22c55e;--idle-bright:#4ade80;--work:#3b82f6;--alert:#f97316;--question:#06b6d4;--ink:#050505;--spring:cubic-bezier(.175,.885,.32,1.1)}
     *{box-sizing:border-box}
     html,body{min-width:320px;min-height:100%;margin:0;background:#dfe6eb;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif}
     button{font:inherit}
     .demo{min-height:100vh;padding:18px;display:grid;place-items:center;background:radial-gradient(circle at 50% 0,#f8fbfc 0,#dfe6eb 68%)}
-    .desktop{position:relative;width:min(880px,calc(100vw - 36px));aspect-ratio:16/9;min-height:350px;overflow:hidden;border:1px solid rgba(20,35,45,.13);border-radius:16px;background:linear-gradient(145deg,#eef4f7,#cbd8df);box-shadow:0 24px 70px rgba(27,43,52,.18)}
+    .desktop{position:relative;width:min(880px,calc(100vw - 36px));aspect-ratio:16/9;min-height:430px;overflow:hidden;border:1px solid rgba(20,35,45,.13);border-radius:16px;background:linear-gradient(145deg,#eef4f7,#cbd8df);box-shadow:0 24px 70px rgba(27,43,52,.18)}
     .menubar{height:28px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;background:rgba(245,249,251,.72);color:#20303a;font-size:10px;backdrop-filter:blur(16px)}
     .brand{font-weight:700}.clock{font-variant-numeric:tabular-nums}
     .wallpaper{position:absolute;inset:28px 0 0;display:grid;place-items:center;color:rgba(25,50,63,.4)}
-    .wallpaper-copy{text-align:center}.wallpaper-copy strong{display:block;color:rgba(25,50,63,.63);font-size:clamp(20px,4vw,40px)}.wallpaper-copy span{font-size:12px}
+    .wallpaper-copy{transform:translateY(58px);text-align:center}.wallpaper-copy strong{display:block;color:rgba(25,50,63,.63);font-size:clamp(20px,4vw,40px)}.wallpaper-copy span{font-size:12px}
     .island-wrap{position:absolute;z-index:3;top:0;left:50%;transform:translateX(-50%);display:flex;justify-content:center}
-    .island{position:relative;width:260px;height:40px;overflow:visible;border-radius:0 0 10px 10px;background:#000;color:#e5e5e5;box-shadow:0 2px 8px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.3);transition:width .5s var(--spring),height .5s var(--spring),border-radius .4s ease-out}
+    .island{position:relative;width:380px;height:175px;overflow:visible;border-radius:0 0 14px 14px;background:#000;color:#e5e5e5;box-shadow:0 2px 8px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.3),0 0 15px rgba(255,255,255,.04);transition:width .5s var(--spring),height .5s var(--spring),border-radius .4s ease-out,box-shadow .4s ease-out}
     .island::before,.island::after{content:"";position:absolute;top:0;width:13px;height:25px;pointer-events:none}
     .island::before{left:-13px;border-radius:0 6px 0 0;box-shadow:5px 0 0 #000}
     .island::after{right:-13px;border-radius:6px 0 0 0;box-shadow:-5px 0 0 #000}
-    .island[data-state="ask"]{width:340px;height:160px;border-radius:0 0 14px 14px}
-    .layer{position:absolute;inset:0;overflow:hidden;border-radius:inherit;display:flex;opacity:0;transform:scale(.96);filter:blur(2px);transition:opacity .25s,filter .3s,transform .35s var(--spring);pointer-events:none}
+    .island[data-state="overview"],.island[data-state="jump"]{width:380px;height:175px}
+    .island[data-state="approval"]{width:380px;height:220px;box-shadow:0 2px 8px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.3),0 0 20px rgba(249,115,22,.15)}
+    .island[data-state="ask"]{width:340px;height:165px;box-shadow:0 2px 8px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.3),0 0 20px rgba(6,182,212,.15)}
+    .layer{position:absolute;inset:0;overflow:hidden;border-radius:inherit;display:flex;opacity:0;transform:scale(.96);filter:blur(6px);transition:opacity .25s,filter .3s,transform .35s var(--spring);pointer-events:none}
     .layer.is-active{opacity:1;transform:scale(1);filter:blur(0);transition-delay:.06s;pointer-events:auto}
-    .compact{padding:0 14px;align-items:center;justify-content:space-between;font-size:11px}
-    .agent{display:flex;align-items:center;gap:7px}.agent-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px rgba(6,182,212,.8)}.status{color:rgba(255,255,255,.55)}
-    .ask{padding:12px 14px;flex-direction:column;gap:6px;border-radius:0 0 14px 14px}
-    .ask-head{display:flex;align-items:center;gap:5px;color:var(--cyan);font-size:10px;font-weight:600;line-height:16px}
-    .ask-head svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8}
-    .ask-question{color:rgba(255,255,255,.9);font-size:11px;font-weight:500;line-height:17.6px}
-    .ask-options{display:flex;flex-direction:column;gap:3px}
-    .ask-option{width:100%;height:28px;padding:5px 10px;border:0;border-radius:6px;display:flex;align-items:center;gap:8px;background:rgba(6,182,212,.15);color:rgba(255,255,255,.9);font-size:10px;text-align:left;cursor:pointer;transition:background .15s,transform .15s}
-    .ask-option:hover,.ask-option:focus-visible{outline:none;background:rgba(6,182,212,.3);transform:translateX(2px)}
-    .ask-option.is-selected{background:rgba(6,182,212,.42)}
-    .shortcut{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;flex:0 0 18px;background:rgba(6,182,212,.6);color:#fff;font:700 9px/1 ui-monospace,"SFMono-Regular",monospace;opacity:.72}
-    .controls{position:absolute;z-index:2;left:50%;bottom:22px;transform:translateX(-50%);padding:4px;display:flex;gap:3px;border:1px solid rgba(20,35,45,.12);border-radius:8px;background:rgba(248,251,252,.78);box-shadow:0 8px 22px rgba(40,61,72,.12);backdrop-filter:blur(12px)}
-    .controls button{height:28px;padding:0 12px;border:0;border-radius:5px;background:transparent;color:#51636d;font-size:11px;cursor:pointer}
-    .controls button[aria-pressed="true"]{background:#fff;color:#10232e;box-shadow:0 1px 5px rgba(30,49,59,.14)}
+    .overview,.jump{padding:10px 12px;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:3px}
+    .usage{height:17px;padding:2px 8px 3px;display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.4);font:9.5px/1 ui-monospace,"SFMono-Regular",monospace;white-space:nowrap}
+    .usage svg{width:9px;height:9px;flex:0 0 9px}.usage b{color:rgba(255,255,255,.82)}.usage strong{color:#57d977}.usage i{margin:0 2px;color:rgba(255,255,255,.22);font-style:normal}
+    .session{min-height:31px;padding:5px 8px;border:0;border-radius:6px;display:flex;align-items:center;gap:8px;background:transparent;color:inherit;text-align:left;transition:background .15s,transform .15s}
+    button.session{width:100%;cursor:pointer}.session:hover,.session:focus-visible{outline:none;background:rgba(255,255,255,.08)}.session.hero{min-height:47px;padding:8px;align-items:flex-start;gap:10px}.session.highlight{background:rgba(255,255,255,.06)}
+    .pet{width:16px;height:16px;flex:0 0 16px;margin-top:4px;color:var(--work);filter:drop-shadow(0 0 2px currentColor)}.jump .pet{color:var(--idle)}
+    .session-info{min-width:0;flex:1}.session-row{display:flex;align-items:center;gap:6px}.session-name{min-width:0;flex:1;overflow:hidden;color:#fff;font-size:12px;font-weight:500;text-overflow:ellipsis;white-space:nowrap}.session-you{overflow:hidden;color:rgba(255,255,255,.4);font-size:10px;line-height:1.3;text-overflow:ellipsis;white-space:nowrap}.tag{padding:2px 5px;border-radius:4px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:9px;font-weight:500}.duration{color:rgba(255,255,255,.35);font-size:9px}.status-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:var(--idle)}
+    .approval{padding:12px 14px;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px}
+    .approval-head{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.4);font-size:11px}.approval-dot{width:6px;height:6px;border-radius:50%;background:var(--alert);animation:pulse 1.5s infinite}
+    .approval-tool{display:flex;align-items:center;gap:6px;min-width:0}.approval-icon,.approval-name{color:var(--alert)}.approval-name{font:600 11px/1 ui-monospace,"SFMono-Regular",monospace}.approval-path{overflow:hidden;color:rgba(255,255,255,.85);font:11px/1 ui-monospace,"SFMono-Regular",monospace;text-overflow:ellipsis;white-space:nowrap}
+    .diff{max-height:86px;padding:3px 0;overflow:hidden;border-radius:4px;background:rgba(255,255,255,.04);font-family:ui-monospace,"SFMono-Regular",monospace}.diff-line{padding:0 6px;display:flex;align-items:baseline;gap:4px;color:rgba(255,255,255,.5);font-size:9px;line-height:1.6;white-space:nowrap}.line-no{min-width:14px;color:rgba(255,255,255,.2);text-align:right}.diff-line.del{color:#fca5a5;background:rgba(249,115,22,.08)}.diff-line.add{color:var(--idle-bright);background:rgba(34,197,94,.08)}
+    .approval-actions{margin-top:auto;padding-top:4px;display:flex;gap:6px}.approval-actions button{height:27px;flex:1;border:0;border-radius:6px;font-size:10px;font-weight:500;cursor:pointer}.deny{background:rgba(255,255,255,.15);color:rgba(255,255,255,.9)}.allow{background:rgba(255,255,255,.9);color:#000}.approval-actions button:hover,.approval-actions button:focus-visible{outline:2px solid rgba(249,115,22,.45);outline-offset:1px}.approval-actions kbd{margin-left:3px;font:8px/1 ui-monospace,monospace;opacity:.5}
+    .ask{padding:12px 14px;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px}
+    .ask-head{display:flex;align-items:center;gap:5px;color:var(--question);font-size:10px;font-weight:600;line-height:16px}.ask-head svg{width:12px;height:12px;fill:currentColor;opacity:.9}.ask-question{color:rgba(255,255,255,.9);font-size:11px;font-weight:500;line-height:17.6px}.ask-options{display:flex;flex-direction:column;gap:3px}.ask-option{width:100%;height:28px;padding:5px 10px;border:0;border-radius:6px;display:flex;align-items:center;gap:8px;background:rgba(6,182,212,.15);color:rgba(255,255,255,.9);font-size:10px;text-align:left;cursor:pointer;transition:background .15s,transform .15s}.ask-option:hover,.ask-option:focus-visible{outline:none;background:rgba(6,182,212,.3);transform:translateX(2px)}.ask-option.is-selected{background:rgba(6,182,212,.42)}.shortcut{width:18px;height:18px;border-radius:4px;display:grid;place-items:center;flex:0 0 18px;background:rgba(6,182,212,.6);color:#fff;font:700 9px/1 ui-monospace,"SFMono-Regular",monospace;opacity:.72}
+    .done{color:var(--idle-bright)}
+    .controls{position:absolute;z-index:2;left:50%;bottom:22px;transform:translateX(-50%);padding:4px;display:flex;gap:3px;border:1px solid rgba(20,35,45,.12);border-radius:8px;background:rgba(248,251,252,.82);box-shadow:0 8px 22px rgba(40,61,72,.12);backdrop-filter:blur(12px)}
+    .controls button{height:28px;padding:0 12px;border:0;border-radius:5px;background:transparent;color:#51636d;font-size:11px;white-space:nowrap;cursor:pointer}.controls button[aria-pressed="true"]{background:#fff;color:#10232e;box-shadow:0 1px 5px rgba(30,49,59,.14)}.controls button[data-state="overview"][aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(34,197,94,.35),0 1px 5px rgba(30,49,59,.14)}.controls button[data-state="approval"][aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(249,115,22,.35),0 1px 5px rgba(30,49,59,.14)}.controls button[data-state="ask"][aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(6,182,212,.35),0 1px 5px rgba(30,49,59,.14)}.controls button[data-state="jump"][aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(59,130,246,.35),0 1px 5px rgba(30,49,59,.14)}
     .feedback{position:absolute;left:50%;bottom:68px;transform:translate(-50%,8px);margin:0;color:#2c4a58;font-size:11px;opacity:0;transition:.2s}.feedback.is-visible{opacity:1;transform:translate(-50%,0)}
-    @media(max-width:520px){.demo{padding:8px}.desktop{width:calc(100vw - 16px);min-height:420px;aspect-ratio:auto}.island[data-state="ask"]{width:min(340px,calc(100vw - 34px))}.ask-option{height:28px}.controls{bottom:16px}}
-    @media(prefers-reduced-motion:reduce){.island,.layer,.ask-option,.feedback{transition-duration:.01ms}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @media(max-width:520px){.demo{padding:8px}.desktop{width:calc(100vw - 16px);min-height:430px;aspect-ratio:auto}.island[data-state="overview"],.island[data-state="approval"],.island[data-state="jump"]{width:min(380px,calc(100vw - 34px))}.island[data-state="ask"]{width:min(340px,calc(100vw - 34px))}.controls{bottom:16px;width:calc(100% - 28px)}.controls button{min-width:0;flex:1;padding:0 4px}.feedback{bottom:62px}}
+    @media(prefers-reduced-motion:reduce){.island,.layer,.session,.ask-option,.feedback{transition-duration:.01ms}.approval-dot{animation:none}}
   </style>
 </head>
 <body>
   <main class="demo">
-    <section class="desktop" aria-label="AI Agent 灵动岛询问面板演示">
+    <section class="desktop" aria-label="AI Agent 灵动岛四状态演示">
       <header class="menubar"><span class="brand">Vibe Island</span><span class="clock">Thu 20:27</span></header>
       <div class="wallpaper"><div class="wallpaper-copy"><strong>Stay in flow.</strong><span>Agent decisions appear at the top of your workspace.</span></div></div>
       <div class="island-wrap">
-        <div class="island" data-state="ask" id="island">
-          <div class="layer compact" data-layer="compact"><span class="agent"><i class="agent-dot"></i>Claude</span><span class="status">Working</span></div>
-          <div class="layer ask is-active" data-layer="ask">
-            <div class="ask-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.1 9a3 3 0 1 1 5.2 2c-1.2 1.1-2.3 1.6-2.3 3.5M12 18h.01"/></svg><span>Claude asks</span></div>
-            <div class="ask-question">Which deployment target?</div>
-            <div class="ask-options">
-              <button class="ask-option" data-value="Production"><span class="shortcut">⌘1</span><span>Production</span></button>
-              <button class="ask-option" data-value="Staging"><span class="shortcut">⌘2</span><span>Staging</span></button>
-              <button class="ask-option" data-value="Local only"><span class="shortcut">⌘3</span><span>Local only</span></button>
+        <div class="island" data-state="overview" id="island">
+          <div class="layer overview is-active" data-layer="overview">
+            <div class="usage" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 0c.5 4.9 1.4 6.6 3.1 8.3S19.1 11.5 24 12c-4.9.5-6.6 1.4-8.3 3.1S12.5 19.1 12 24c-.5-4.9-1.4-6.6-3.1-8.3S4.9 12.5 0 12c4.9-.5 6.6-1.4 8.3-3.1S11.5 4.9 12 0z" fill="#e8833f"/></svg><b>5h</b><strong>11%</strong><span>4h1m</span><i>|</i><b>7d</b><strong>2%</strong><span>6h1m</span></div>
+            <div class="session hero"><svg class="pet" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="2" width="1" height="1" fill="#60a5fa"/><rect x="4" y="2" width="1" height="1" fill="#60a5fa"/><rect x="0" y="3" width="6" height="2" fill="currentColor"/><rect x="1" y="3" width="1" height="1" fill="#000"/><rect x="4" y="3" width="1" height="1" fill="#000"/><rect x="1" y="5" width="2" height="1" fill="currentColor"/><rect x="4" y="5" width="2" height="1" fill="currentColor"/></svg><div class="session-info"><div class="session-row"><span class="session-name">fix auth bug</span><span class="tag">Claude</span><span class="tag">iTerm</span><span class="duration">27m</span></div><div class="session-you">You: fix the token validation before deploy</div></div></div>
+            <div class="session"><i class="status-dot"></i><span class="session-name">landing page motion</span><span class="tag">Codex</span><span class="tag">Cursor</span><span class="duration">12m</span></div>
+            <div class="session"><i class="status-dot" style="background:var(--work)"></i><span class="session-name">search indexing</span><span class="tag">Gemini</span><span class="tag">Ghostty</span><span class="duration">5h</span></div>
+          </div>
+
+          <div class="layer approval" data-layer="approval">
+            <div class="approval-head"><i class="approval-dot"></i><span>Permission Request</span></div>
+            <div class="approval-tool"><span class="approval-icon">⚠</span><span class="approval-name">Edit</span><span class="approval-path">src/auth/middleware.ts</span></div>
+            <div class="diff" aria-label="代码差异">
+              <div class="diff-line"><span class="line-no">12</span><span>const verify = (token) =&gt;</span></div>
+              <div class="diff-line del"><span class="line-no">13</span><span>- jwt.verify(token);</span></div>
+              <div class="diff-line add"><span class="line-no">13</span><span>+ if (!token) throw new</span></div>
+              <div class="diff-line add"><span class="line-no">14</span><span>+ &nbsp; AuthError('missing');</span></div>
             </div>
+            <div class="approval-actions"><button class="deny" type="button" data-decision="Denied">Deny <kbd>⌘N</kbd></button><button class="allow" type="button" data-decision="Approved">Allow <kbd>⌘Y</kbd></button></div>
+          </div>
+
+          <div class="layer ask" data-layer="ask">
+            <div class="ask-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Claude asks</span></div>
+            <div class="ask-question">Which deployment target?</div>
+            <div class="ask-options"><button class="ask-option" data-value="Production"><span class="shortcut">⌘1</span><span>Production</span></button><button class="ask-option" data-value="Staging"><span class="shortcut">⌘2</span><span>Staging</span></button><button class="ask-option" data-value="Local only"><span class="shortcut">⌘3</span><span>Local only</span></button></div>
+          </div>
+
+          <div class="layer jump" data-layer="jump">
+            <div class="usage" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 0c.5 4.9 1.4 6.6 3.1 8.3S19.1 11.5 24 12c-4.9.5-6.6 1.4-8.3 3.1S12.5 19.1 12 24c-.5-4.9-1.4-6.6-3.1-8.3S4.9 12.5 0 12c4.9-.5 6.6-1.4 8.3-3.1S11.5 4.9 12 0z" fill="#e8833f"/></svg><b>5h</b><strong>11%</strong><span>4h1m</span><i>|</i><b>7d</b><strong>2%</strong><span>6h1m</span></div>
+            <button class="session hero highlight" type="button" data-jump="fix auth bug"><svg class="pet" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="2" width="1" height="1" fill="#4ade80"/><rect x="4" y="2" width="1" height="1" fill="#4ade80"/><rect x="0" y="3" width="6" height="2" fill="currentColor"/><rect x="1" y="3" width="1" height="1" fill="#000"/><rect x="4" y="3" width="1" height="1" fill="#000"/><rect x="1" y="5" width="2" height="1" fill="currentColor"/><rect x="4" y="5" width="2" height="1" fill="currentColor"/></svg><span class="session-info"><span class="session-row"><span class="session-name">fix auth bug</span><span class="tag">Claude</span><span class="tag">iTerm</span><span class="duration">28m</span></span><span class="session-you done">Done — click to jump</span></span></button>
+            <button class="session" type="button" data-jump="landing page motion"><i class="status-dot"></i><span class="session-name">landing page motion</span><span class="tag">Codex</span><span class="tag">Cursor</span><span class="duration">13m</span></button>
+            <button class="session" type="button" data-jump="search indexing"><i class="status-dot" style="background:var(--work)"></i><span class="session-name">search indexing</span><span class="tag">Gemini</span><span class="tag">Ghostty</span><span class="duration">5h</span></button>
           </div>
         </div>
       </div>
       <p class="feedback" id="feedback" aria-live="polite"></p>
       <nav class="controls" aria-label="组件状态">
-        <button type="button" data-state="compact" aria-pressed="false">紧凑</button>
-        <button type="button" data-state="ask" aria-pressed="true">询问</button>
+        <button type="button" data-state="overview" aria-pressed="true">总览</button><button type="button" data-state="approval" aria-pressed="false">批准</button><button type="button" data-state="ask" aria-pressed="false">询问</button><button type="button" data-state="jump" aria-pressed="false">跳回</button>
       </nav>
     </section>
   </main>
@@ -73,12 +99,15 @@
     const stateButtons=[...document.querySelectorAll('.controls button[data-state]')];
     const options=[...document.querySelectorAll('.ask-option')];
     const feedback=document.querySelector('#feedback');
-    let resetTimer;
-    function setState(state){island.dataset.state=state;layers.forEach(layer=>layer.classList.toggle('is-active',layer.dataset.layer===state));stateButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.state===state)))}
-    function choose(option){clearTimeout(resetTimer);options.forEach(item=>item.classList.toggle('is-selected',item===option));feedback.textContent='Selected: '+option.dataset.value;feedback.classList.add('is-visible');resetTimer=setTimeout(()=>{options.forEach(item=>item.classList.remove('is-selected'));feedback.classList.remove('is-visible')},1400)}
+    let feedbackTimer;
+    function announce(message){clearTimeout(feedbackTimer);feedback.textContent=message;feedback.classList.add('is-visible');feedbackTimer=setTimeout(()=>feedback.classList.remove('is-visible'),1600)}
+    function setState(state){island.dataset.state=state;layers.forEach(layer=>layer.classList.toggle('is-active',layer.dataset.layer===state));stateButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.state===state)));feedback.classList.remove('is-visible')}
+    function choose(option){options.forEach(item=>item.classList.toggle('is-selected',item===option));announce('Selected: '+option.dataset.value)}
     stateButtons.forEach(button=>button.addEventListener('click',()=>setState(button.dataset.state)));
     options.forEach(option=>option.addEventListener('click',()=>choose(option)));
-    window.addEventListener('keydown',event=>{if(island.dataset.state!=='ask')return;const index=Number(event.key)-1;if(index>=0&&index<options.length)choose(options[index])});
+    document.querySelectorAll('[data-decision]').forEach(button=>button.addEventListener('click',()=>announce(button.dataset.decision+': src/auth/middleware.ts')));
+    document.querySelectorAll('[data-jump]').forEach(button=>button.addEventListener('click',()=>announce('Jumped to: '+button.dataset.jump)));
+    window.addEventListener('keydown',event=>{if(island.dataset.state==='ask'){const index=Number(event.key)-1;if(index>=0&&index<options.length)choose(options[index])}if(island.dataset.state==='approval'&&(event.key.toLowerCase()==='y'||event.key.toLowerCase()==='n'))announce(event.key.toLowerCase()==='y'?'Approved: src/auth/middleware.ts':'Denied: src/auth/middleware.ts')});
   </script>
 </body>
 </html>
