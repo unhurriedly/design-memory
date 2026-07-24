@@ -1,20 +1,27 @@
 @font-face {
   font-family: "MiSans";
-  src: url("https://filecdn.minimax.chat/public/MiSans-Normal.woff2") format("woff2");
+  src: url("./assets/fonts/misans/MiSans-Normal.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "MiSans";
-  src: url("https://filecdn.minimax.chat/public/MiSans-Medium.woff2") format("woff2");
-  font-weight: 500 900;
+  src: url("./assets/fonts/misans/MiSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MiSans";
+  src: url("./assets/fonts/misans/MiSans-Semibold.woff2") format("woff2");
+  font-weight: 600 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Outfit";
-  src: url("https://filecdn.minimax.chat/public/09e926a9-f079-4d5f-82c9-1e17dd0ababc.ttf") format("truetype");
+  src: url("./assets/fonts/misans/Outfit.ttf") format("truetype");
   font-weight: 400 900;
   font-style: normal;
   font-display: swap;
@@ -146,6 +153,7 @@ a { color: inherit; }
 .source-row { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; }
 .source-row .favicon { width: 16px; height: 16px; border-radius: 3px; object-fit: contain; }
 .source-row .status { margin-left: auto; padding: 3px 6px; border-radius: 4px; background: var(--green-soft); color: var(--green-dark); font-family: "Outfit", "MiSans", sans-serif; font-weight: 700; }
+.source-initial { width: 18px; height: 18px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: var(--surface-muted); color: var(--muted); font-family: "Outfit", "MiSans", sans-serif; font-size: 9px; font-weight: 700; text-transform: uppercase; }
 .source-row .status.pending { background: #f2eee2; color: #7a642d; }
 .asset-card h2 { margin: 10px 0 7px; font-size: 16px; line-height: 1.35; letter-spacing: 0; }
 .asset-card .description { min-height: 42px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

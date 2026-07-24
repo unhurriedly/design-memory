@@ -12,19 +12,19 @@ const benHtml = String.raw`<section class="type-specimen">
 
 const benCss = String.raw`@font-face {
   font-family: "Roobert";
-  src: url("https://www.benshih.design/_next/static/media/e717f2176a60f97a-s.p.otf") format("opentype");
+  src: url("./assets/fonts/benshih/Roobert-Regular.otf") format("opentype");
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
   font-family: "Roobert";
-  src: url("https://www.benshih.design/_next/static/media/1f43618828b4e276-s.p.otf") format("opentype");
+  src: url("./assets/fonts/benshih/Roobert-Medium.otf") format("opentype");
   font-weight: 500;
   font-display: swap;
 }
 @font-face {
   font-family: "Acorn";
-  src: url("https://www.benshih.design/_next/static/media/78e0d29f8bb7d66f-s.p.otf") format("opentype");
+  src: url("./assets/fonts/benshih/Acorn-Semibold.otf") format("opentype");
   font-weight: 600;
   font-display: swap;
 }
@@ -93,13 +93,13 @@ const benTipsHtml = String.raw`<section class="tips-deck" aria-label="内容导�
 
 const benTipsCss = String.raw`@font-face {
   font-family: "Roobert";
-  src: url("https://www.benshih.design/_next/static/media/1f43618828b4e276-s.p.otf") format("opentype");
+  src: url("./assets/fonts/benshih/Roobert-Medium.otf") format("opentype");
   font-weight: 500;
   font-display: swap;
 }
 @font-face {
   font-family: "Acorn";
-  src: url("https://www.benshih.design/_next/static/media/78e0d29f8bb7d66f-s.p.otf") format("opentype");
+  src: url("./assets/fonts/benshih/Acorn-Semibold.otf") format("opentype");
   font-weight: 600;
   font-display: swap;
 }
@@ -589,7 +589,11 @@ const yuxingHtml = String.raw`<section class="yuxing-type" aria-label="御行中
   </div>
 </section>`;
 
-const yuxingCss = String.raw`@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600;700;900&display=swap");
+const yuxingCss = String.raw`@font-face{font-family:"Noto Sans SC";src:url("./assets/fonts/noto/NotoSansSC-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Noto Sans SC";src:url("./assets/fonts/noto/NotoSansSC-Medium.ttf") format("truetype");font-weight:500;font-display:swap}
+@font-face{font-family:"Noto Serif SC";src:url("./assets/fonts/noto/NotoSerifSC-Semibold.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Noto Serif SC";src:url("./assets/fonts/noto/NotoSerifSC-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Noto Serif SC";src:url("./assets/fonts/noto/NotoSerifSC-Black.ttf") format("truetype");font-weight:900;font-display:swap}
 * { box-sizing: border-box; }
 .yuxing-type {
   --black: #000;
@@ -836,9 +840,10 @@ const minimaxTypeHtml = String.raw`<section class="minimax-type" aria-label="MiS
   </div>
 </section>`;
 
-const minimaxTypeCss = String.raw`@font-face{font-family:MiSans;src:url("https://filecdn.minimax.chat/public/MiSans-Normal.woff2") format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:MiSans;src:url("https://filecdn.minimax.chat/public/MiSans-Medium.woff2") format("woff2");font-weight:500;font-display:swap}
-@font-face{font-family:Outfit;src:url("https://filecdn.minimax.chat/public/09e926a9-f079-4d5f-82c9-1e17dd0ababc.ttf") format("truetype");font-display:swap}
+const minimaxTypeCss = String.raw`@font-face{font-family:MiSans;src:url("./assets/fonts/misans/MiSans-Normal.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:MiSans;src:url("./assets/fonts/misans/MiSans-Medium.woff2") format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:MiSans;src:url("./assets/fonts/misans/MiSans-Semibold.woff2") format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:Outfit;src:url("./assets/fonts/misans/Outfit.ttf") format("truetype");font-display:swap}
 *{box-sizing:border-box}button,input{font:inherit}
 .minimax-type{--ink:#181e25;--muted:#86909c;--line:#e5e8eb;--blue:#2864dc;--title-size:80px;min-height:620px;overflow:hidden;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);font-family:MiSans,"PingFang SC",sans-serif}
 .type-controls{min-height:56px;padding:8px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;background:#fbfcfd}.type-controls strong{font:500 13px Outfit,sans-serif}.type-controls label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:10px}.type-controls input{width:90px;accent-color:var(--blue)}.type-controls output{width:34px;color:#45515e}
@@ -951,7 +956,7 @@ document.querySelectorAll("[data-decision]").forEach(button=>button.addEventList
 document.querySelectorAll("[data-jump]").forEach(button=>button.addEventListener("click",()=>announce("Jumped to: "+button.dataset.jump)));
 window.addEventListener("keydown",event=>{if(island.dataset.state!=="ask")return;const index=Number(event.key)-1;if(index>=0&&index<options.length)choose(options[index])});`;
 
-export const assetTypes = [
+const assetTypes = [
   { id: "all", label: "全部资产", icon: "grid" },
   { id: "typography", label: "字体排版", icon: "type" },
   { id: "card", label: "卡片组件", icon: "box" },
@@ -961,7 +966,7 @@ export const assetTypes = [
   { id: "favorite", label: "我的收藏", icon: "star" }
 ];
 
-export const seedAssets = [
+const seedAssets = [
   {
     id: "google-labs-orbit-card-carousel",
     source: { id: "google-labs", name: "Google Labs", url: "https://labs.google/?category=create", host: "labs.google" },

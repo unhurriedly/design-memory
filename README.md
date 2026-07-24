@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./ChatGPT%20Image%202026年7月23日%2016_29_14.png" width="760" alt="设记 Design Memory 品牌标志与项目口号">
+  <img src="./assets/brand/sheji-design-memory-lockup.png" width="760" alt="设记 Design Memory 品牌标志与项目口号">
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 - 原站实测、代码推断和本地复现的分析依据
 - 可复制使用的 HTML、CSS 和 JavaScript 代码
 
-项目采用纯静态前端实现，无需构建工具或后端服务，可以直接部署到 GitHub Pages。
+项目采用纯静态前端实现。完整字体、图片、组件预览、代码和元数据都保存在项目目录中，无需安装依赖、构建工具或后端服务，断网时也可以完整浏览。
 
 ## 在线体验
 
@@ -48,21 +48,41 @@
 | 大模型分段输出动效 | 交互动效 | Diffmind |
 | 可拖拽缩放的叠层产品窗口 | 交互动效 | Cursor |
 
-## 本地运行
+## 下载后直接使用
 
-项目使用 ES Modules，不能仅通过双击 `index.html` 完整运行。请在项目根目录启动一个静态文件服务器：
+在 GitHub 仓库页面选择 **Code → Download ZIP**，下载后先完整解压。不要只保存 `index.html`，字体、图片、预览和数据都通过项目内相对路径关联。
+
+解压后，推荐双击对应系统的一键入口：
+
+- macOS：双击 `start-macos.command`
+- Windows：双击 `start-windows.bat`
+
+入口会自动打开浏览器，不需要输入命令、安装 npm 或连接网络。使用期间保留启动窗口，关闭窗口即可停止本地服务。
+
+也可以直接双击 `index.html` 快速浏览。少数浏览器会限制本地文件加载字体或组件预览；遇到这种情况，改用上面的一键入口即可。
+
+### 可选：通过本地服务器打开
+
+开发者需要调试页面时，可以在项目根目录运行：
 
 ```bash
 python3 -m http.server 4173
 ```
 
-然后访问：
+然后访问 `http://127.0.0.1:4173/`。这是开发调试方式，不是普通用户使用项目的前置条件。
 
-```text
-http://127.0.0.1:4173/
-```
+## 离线范围
 
-也可以使用任意支持静态文件和 ES Modules 的本地服务器。
+以下内容均包含在下载包中并可离线使用：
+
+- 记忆资源库页面、搜索、筛选、收藏和详情面板
+- 所有独立组件预览及其交互逻辑
+- MiSans、Outfit、Noto Sans SC、Noto Serif SC、Roobert 和 Acorn 字体文件
+- 组件图片、品牌图片与分析参考截图
+- 可复制的 HTML、CSS、JavaScript 和自然语言元数据
+- `SKILL.md` 中的网站分析和入库方法
+
+资源详情中的“来源网站”链接属于溯源元数据，点击它会访问外部网站；不点击这些链接不会产生网络请求。收藏和最近浏览状态保存在当前浏览器中，不会改写项目文件。
 
 ## 项目结构
 
@@ -80,7 +100,11 @@ http://127.0.0.1:4173/
 ├── assets/
 │   ├── brand/                        # 设记品牌资源
 │   ├── components/                   # 组件使用的本地素材
+│   ├── fonts/                        # 离线字体文件
 │   └── references/                   # 原始参考截图
+├── start-macos.command               # macOS 一键打开
+├── start-windows.bat                 # Windows 一键打开
+├── start-windows.ps1                 # Windows 内置本地服务
 └── SKILL.md                           # 网站分析、复现与入库规范
 ```
 
@@ -162,10 +186,10 @@ git push
 ## 技术实现
 
 - 原生 HTML、CSS 和 JavaScript
-- ES Modules
+- 无模块加载器的原生脚本，可直接从本地文件打开
 - CSS Grid、Flexbox、Container/Media Queries
 - iframe 沙箱中的独立组件预览
 - localStorage 本地状态
 - GitHub Pages 静态托管
 
-项目不依赖 npm，也没有生产构建步骤。
+项目不依赖 npm，也没有生产构建步骤或运行时网络依赖。

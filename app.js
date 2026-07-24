@@ -1,5 +1,3 @@
-import { assetTypes, seedAssets } from "./data/resources.js?v=vibe-eight-variants-1";
-
 const STORAGE_KEY = "shiguang-component-assets-v2";
 const LEGACY_KEY = "shiguang-design-library-v1";
 const RECENT_VIEWS_KEY = "shiguang-recently-viewed-assets-v1";
@@ -141,7 +139,11 @@ function migrateLegacyAsset(item) {
 }
 
 function saveAssets() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(assets));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(assets));
+  } catch {
+    // The library remains usable when a browser restricts storage for local files.
+  }
 }
 
 function loadRecentAssetIds() {
@@ -265,7 +267,7 @@ function createAssetCard(asset) {
     </div>
     <div class="asset-body">
       <div class="source-row">
-        <img class="favicon" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(asset.source.host)}&sz=64" alt="" onerror="this.style.visibility='hidden'">
+        <span class="source-initial" aria-hidden="true">${escapeHtml(asset.source.name.trim().charAt(0) || "D")}</span>
         <span>${escapeHtml(asset.source.name)}</span>
         <span class="status ${asset.status === "pending" ? "pending" : ""}">${asset.status === "ready" ? "可调用" : "待分析"}</span>
       </div>
